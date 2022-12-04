@@ -25,23 +25,22 @@ namespace AoC2022.solution
 
                 List<int> firstItemsList = new List<int>();
                 List<int> secondItemsList = new List<int>();
+
                 for (int i = Int32.Parse(firstItems[0]); i <= Int32.Parse(firstItems[1]); i++)
                 {
                     firstItemsList.Add(i);
-                    //Console.WriteLine("helo - " + i);
                 }
 
                 for (int i = Int32.Parse(secondItems[0]); i <= Int32.Parse(secondItems[1]); i++)
                 {
                     secondItemsList.Add(i);
-                    //Console.WriteLine("\nhelo2 - " + i);
                 }
-                var firstNotSecond = firstItemsList.Except(secondItemsList).ToList();
-                var secondNotFirst = secondItemsList.Except(firstItemsList).ToList();
+
                 if((firstItemsList.First() >= secondItemsList.First() && firstItemsList.Last() <= secondItemsList.Last()) || (secondItemsList.First() >= firstItemsList.First() && secondItemsList.Last() <= firstItemsList.Last()))
                 {
                     fullyContained++;
                 }
+
                 if ((firstItemsList.First() >= secondItemsList.First() && firstItemsList.First() <= secondItemsList.Last()) || (secondItemsList.First() >= firstItemsList.First() && secondItemsList.First() <= firstItemsList.Last()))
                 {
                     overlapped++;
