@@ -93,8 +93,8 @@ namespace AoC2022.solution
             monkey6.FalseMonkeyDestinationObject = monkey7;
             monkey7.TrueMonkeyDestinationObject = monkey4;
             monkey7.FalseMonkeyDestinationObject = monkey3;
-            
-            
+
+
 
             /*
             //List<double> ints = new List<double> { 79, 98 };
@@ -147,13 +147,13 @@ namespace AoC2022.solution
             monkey3.TrueMonkeyDestinationObject = monkey0;
             monkey3.FalseMonkeyDestinationObject = monkey1;
             */
-            
+
 
 
             // NEW WRONG ANSWER = 19586832084
             // NEW WRONG ANSWER = 24789132096
             // NEW WRONG ANSWER = 32332159276
-            // NEW WRONG ANSWER = 32332159276
+            // NEW WRONG ANSWER = 32333418600
 
 
 
