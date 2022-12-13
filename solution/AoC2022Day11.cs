@@ -94,246 +94,179 @@ namespace AoC2022.solution
             monkey7.TrueMonkeyDestinationObject = monkey4;
             monkey7.FalseMonkeyDestinationObject = monkey3;
 
-
-
-            /*
-            //List<double> ints = new List<double> { 79, 98 };
-            IDictionary<int, double> ints0 = new Dictionary<int, double>();
-            ints0.Add(1, 79);
-            ints0.Add(2, 98);
-            IDictionary<int, double> ints = new Dictionary<int, double> ();
-            ints.Add(1, 79);
-            ints.Add(2, 98);
-            monkeyObject monkey0 = new monkeyObject(ints, '*', "19", 23, 2, 3);
-
-            //List<double> ints1 = new List<double> { 54, 65, 75, 74 };
-            IDictionary<int, double> ints10 = new Dictionary<int, double>();
-            ints10.Add(3, 54);
-            ints10.Add(4, 65);
-            ints10.Add(5, 75);
-            ints10.Add(6, 74);
-            IDictionary<int, double> ints1 = new Dictionary<int, double>();
-            ints1.Add(3, 54);
-            ints1.Add(4, 65);
-            ints1.Add(5, 75);
-            ints1.Add(6, 74);
-            monkeyObject monkey1 = new monkeyObject(ints1, '+', "6", 19, 2, 0);
-
-            //List<double> ints2 = new List<double> { 79, 60, 97 };
-            IDictionary<int, double> ints20 = new Dictionary<int, double>();
-            ints20.Add(7, 79);
-            ints20.Add(8, 60);
-            ints20.Add(9, 97);
-            IDictionary<int, double> ints2 = new Dictionary<int, double>();
-            ints2.Add(7, 79);
-            ints2.Add(8, 60);
-            ints2.Add(9, 97);
-            monkeyObject monkey2 = new monkeyObject(ints2, '*', "old", 13, 1, 3);
-
-            //List<double> ints3 = new List<double> { 74 };
-            IDictionary<int, double> ints30 = new Dictionary<int, double>();
-            ints30.Add(10, 74);
-
-            IDictionary<int, double> ints3 = new Dictionary<int, double>();
-            ints3.Add(10, 74);
-            monkeyObject monkey3 = new monkeyObject(ints3, '+', "3", 17, 0, 1);
-
-            monkey0.TrueMonkeyDestinationObject = monkey2;
-            monkey0.FalseMonkeyDestinationObject = monkey3;
-            monkey1.TrueMonkeyDestinationObject = monkey2;
-            monkey1.FalseMonkeyDestinationObject = monkey0;
-            monkey2.TrueMonkeyDestinationObject = monkey1;
-            monkey2.FalseMonkeyDestinationObject = monkey3;
-            monkey3.TrueMonkeyDestinationObject = monkey0;
-            monkey3.FalseMonkeyDestinationObject = monkey1;
-            */
-
-
-
-            // NEW WRONG ANSWER = 19586832084
-            // NEW WRONG ANSWER = 24789132096
-            // NEW WRONG ANSWER = 32332159276
-            // NEW WRONG ANSWER = 32333418600
-
-
-
-
             MathEvaluator eval = new MathEvaluator();
 
             double tempWorryLevel = 0;
             DataTable dt = new DataTable();
             List<double> tempItems = new List<double>();
             List<string> reviewedItemCount = new List<string>();
-            //double tempValue = 96577;
-            double productVal = 2 * 7 * 13 * 5 * 3 * 19 * 11 * 17;
-            double tempValue = 9699690;
-            //double tempValue = productVal;
-            // target after 20 number = 123903
+            double productVal = monkey0.divisibleTest * monkey1.divisibleTest * monkey2.divisibleTest * monkey3.divisibleTest * monkey4.divisibleTest * monkey5.divisibleTest * monkey6.divisibleTest * monkey7.divisibleTest;
+            //double productVal = 2 * 7 * 13 * 5 * 3 * 19 * 11 * 17;
+            double tempValue = productVal;
 
-                for (int x = 0; x < 10000; x++)
+            for (int x = 0; x < 10000; x++)
+            {
+                foreach (var item in monkey0.items)
                 {
-                    foreach (var item in monkey0.items)
+                    tempWorryLevel = eval.Evaluate(item.Value + " " + monkey0.operation + " " + monkey0.operationAmount);
+                    tempWorryLevel = Math.Floor(tempWorryLevel % tempValue);
+                    //tempWorryLevel = Math.Floor(tempWorryLevel / 3);
+                    if (tempWorryLevel % monkey0.divisibleTest == 0)
                     {
-                        tempWorryLevel = eval.Evaluate(item.Value + " " + monkey0.operation + " " + monkey0.operationAmount);
-                        tempWorryLevel = Math.Floor(tempWorryLevel % tempValue);
-                        //tempWorryLevel = Math.Floor(tempWorryLevel / 3);
-                        if (tempWorryLevel % monkey0.divisibleTest == 0)
-                        {
-                            monkey0.TrueMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
-                        }
-                        else
-                        {
-                            monkey0.FalseMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
-                        }
-                        monkey0.inspectItemCount++;
-
+                        monkey0.TrueMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
                     }
-                    monkey0.items.Clear();
-
-                    foreach (var item in monkey1.items)
+                    else
                     {
-                        //tempWorryLevel = eval.Evaluate(item.Value + " " + monkey1.operation + " " + monkey1.operationAmount);
-                        tempWorryLevel = eval.Evaluate(item.Value + " " + monkey1.operation + " " + item.Value);
-                        tempWorryLevel = Math.Floor(tempWorryLevel % tempValue);
-                        //tempWorryLevel = Math.Floor(tempWorryLevel / 3);
-
-                        if (tempWorryLevel % monkey1.divisibleTest == 0)
-                        {
-                            monkey1.TrueMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
-                        }
-                        else
-                        {
-                            monkey1.FalseMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
-                        }
-
-                        monkey1.inspectItemCount++;
+                        monkey0.FalseMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
                     }
-                    monkey1.items.Clear();
-
-                    foreach (var item in monkey2.items)
-                    {
-                        //tempWorryLevel = eval.Evaluate(item.Value + " " + monkey2.operation + " " + item.Value);
-                        tempWorryLevel = eval.Evaluate(item.Value + " " + monkey2.operation + " " + monkey2.operationAmount);
-                        tempWorryLevel = Math.Floor(tempWorryLevel % tempValue);
-                        //tempWorryLevel = Math.Floor(tempWorryLevel / 3);
-                        if (tempWorryLevel % monkey2.divisibleTest == 0)
-                        {
-                            monkey2.TrueMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
-                        }
-                        else
-                        {
-                            monkey2.FalseMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
-                        }
-                        monkey2.inspectItemCount++;
-                    }
-                    monkey2.items.Clear();
-
-                    foreach (var item in monkey3.items)
-                    {
-                        tempWorryLevel = eval.Evaluate(item.Value + " " + monkey3.operation + " " + monkey3.operationAmount);
-                        tempWorryLevel = Math.Floor(tempWorryLevel % tempValue);
-                        //tempWorryLevel = Math.Floor(tempWorryLevel / 3);
-                        if (tempWorryLevel % monkey3.divisibleTest == 0)
-                        {
-                            monkey3.TrueMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
-                        }
-                        else
-                        {
-                            monkey3.FalseMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
-                        }
-                        monkey3.inspectItemCount++;
-                    }
-                    monkey3.items.Clear();
-                    
-                    foreach (var item in monkey4.items)
-                    {
-                        tempWorryLevel = eval.Evaluate(item.Value + " " + monkey4.operation + " " + monkey4.operationAmount);
-                        tempWorryLevel = Math.Floor(tempWorryLevel % tempValue);
-                        //tempWorryLevel = Math.Floor(tempWorryLevel / 3);
-                        if (tempWorryLevel % monkey4.divisibleTest == 0)
-                        {
-                            monkey4.TrueMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
-                        }
-                        else
-                        {
-                            monkey4.FalseMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
-                        }
-                        monkey4.inspectItemCount++;
-                    }
-                    monkey4.items.Clear();
-
-                    foreach (var item in monkey5.items)
-                    {
-                        tempWorryLevel = eval.Evaluate(item.Value + " " + monkey5.operation + " " + monkey5.operationAmount);
-                        tempWorryLevel = Math.Floor(tempWorryLevel % tempValue);
-                        //tempWorryLevel = Math.Floor(tempWorryLevel / 3);
-                        if (tempWorryLevel % monkey5.divisibleTest == 0)
-                        {
-                            monkey5.TrueMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
-                        }
-                        else
-                        {
-                            monkey5.FalseMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
-                        }
-                        monkey5.inspectItemCount++;
-                    }
-                    monkey5.items.Clear();
-
-                    foreach (var item in monkey6.items)
-                    {
-                        tempWorryLevel = eval.Evaluate(item.Value + " " + monkey6.operation + " " + monkey6.operationAmount);
-                        tempWorryLevel = Math.Floor(tempWorryLevel % tempValue);
-                        //tempWorryLevel = Math.Floor(tempWorryLevel / 3);
-                        if (tempWorryLevel % monkey6.divisibleTest == 0)
-                        {
-                            monkey6.TrueMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
-                        }
-                        else
-                        {
-                            monkey6.FalseMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
-                        }
-                        monkey6.inspectItemCount++;
-                    }
-                    monkey6.items.Clear();
-
-                    foreach (var item in monkey7.items)
-                    {
-                        tempWorryLevel = eval.Evaluate(item.Value + " " + monkey7.operation + " " + monkey7.operationAmount);
-                        tempWorryLevel = Math.Floor(tempWorryLevel % tempValue);
-                        //tempWorryLevel = Math.Floor(tempWorryLevel / 3);
-                        if (tempWorryLevel % monkey7.divisibleTest == 0)
-                        {
-                            monkey7.TrueMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
-                        }
-                        else
-                        {
-                            monkey7.FalseMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
-                        }
-                        monkey7.inspectItemCount++;
-                    }
-                    monkey7.items.Clear();  
-                    
+                    monkey0.inspectItemCount++;
 
                 }
+                monkey0.items.Clear();
 
-                List<int> monkeyList = new List<int>();
-                monkeyList.Add(monkey0.inspectItemCount);
-                monkeyList.Add(monkey1.inspectItemCount);
-                monkeyList.Add(monkey2.inspectItemCount);
-                monkeyList.Add(monkey3.inspectItemCount);
-                monkeyList.Add(monkey4.inspectItemCount);
-                monkeyList.Add(monkey5.inspectItemCount);
-                monkeyList.Add(monkey6.inspectItemCount);
-                monkeyList.Add(monkey7.inspectItemCount);
-                monkeyList.Sort();
-                monkeyList.Reverse();
+                foreach (var item in monkey1.items)
+                {
+                    //tempWorryLevel = eval.Evaluate(item.Value + " " + monkey1.operation + " " + monkey1.operationAmount);
+                    tempWorryLevel = eval.Evaluate(item.Value + " " + monkey1.operation + " " + item.Value);
+                    tempWorryLevel = Math.Floor(tempWorryLevel % tempValue);
+                    //tempWorryLevel = Math.Floor(tempWorryLevel / 3);
 
-                double topMonkeyA = monkeyList[0];
-                double topMonkeyB = monkeyList[1];
+                    if (tempWorryLevel % monkey1.divisibleTest == 0)
+                    {
+                        monkey1.TrueMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
+                    }
+                    else
+                    {
+                        monkey1.FalseMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
+                    }
 
-                double monkeyBusiness = topMonkeyA * topMonkeyB;
+                    monkey1.inspectItemCount++;
+                }
+                monkey1.items.Clear();
 
-                output = "Part A: " + monkeyBusiness + " - " + monkeyList[0] + " - " + monkeyList[1] + " - " + monkeyList[2] + " - " + monkeyList[3] + "\n";
+                foreach (var item in monkey2.items)
+                {
+                    //tempWorryLevel = eval.Evaluate(item.Value + " " + monkey2.operation + " " + item.Value);
+                    tempWorryLevel = eval.Evaluate(item.Value + " " + monkey2.operation + " " + monkey2.operationAmount);
+                    tempWorryLevel = Math.Floor(tempWorryLevel % tempValue);
+                    //tempWorryLevel = Math.Floor(tempWorryLevel / 3);
+                    if (tempWorryLevel % monkey2.divisibleTest == 0)
+                    {
+                        monkey2.TrueMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
+                    }
+                    else
+                    {
+                        monkey2.FalseMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
+                    }
+                    monkey2.inspectItemCount++;
+                }
+                monkey2.items.Clear();
+
+                foreach (var item in monkey3.items)
+                {
+                    tempWorryLevel = eval.Evaluate(item.Value + " " + monkey3.operation + " " + monkey3.operationAmount);
+                    tempWorryLevel = Math.Floor(tempWorryLevel % tempValue);
+                    //tempWorryLevel = Math.Floor(tempWorryLevel / 3);
+                    if (tempWorryLevel % monkey3.divisibleTest == 0)
+                    {
+                        monkey3.TrueMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
+                    }
+                    else
+                    {
+                        monkey3.FalseMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
+                    }
+                    monkey3.inspectItemCount++;
+                }
+                monkey3.items.Clear();
+                    
+                foreach (var item in monkey4.items)
+                {
+                    tempWorryLevel = eval.Evaluate(item.Value + " " + monkey4.operation + " " + monkey4.operationAmount);
+                    tempWorryLevel = Math.Floor(tempWorryLevel % tempValue);
+                    //tempWorryLevel = Math.Floor(tempWorryLevel / 3);
+                    if (tempWorryLevel % monkey4.divisibleTest == 0)
+                    {
+                        monkey4.TrueMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
+                    }
+                    else
+                    {
+                        monkey4.FalseMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
+                    }
+                    monkey4.inspectItemCount++;
+                }
+                monkey4.items.Clear();
+
+                foreach (var item in monkey5.items)
+                {
+                    tempWorryLevel = eval.Evaluate(item.Value + " " + monkey5.operation + " " + monkey5.operationAmount);
+                    tempWorryLevel = Math.Floor(tempWorryLevel % tempValue);
+                    //tempWorryLevel = Math.Floor(tempWorryLevel / 3);
+                    if (tempWorryLevel % monkey5.divisibleTest == 0)
+                    {
+                        monkey5.TrueMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
+                    }
+                    else
+                    {
+                        monkey5.FalseMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
+                    }
+                    monkey5.inspectItemCount++;
+                }
+                monkey5.items.Clear();
+
+                foreach (var item in monkey6.items)
+                {
+                    tempWorryLevel = eval.Evaluate(item.Value + " " + monkey6.operation + " " + monkey6.operationAmount);
+                    tempWorryLevel = Math.Floor(tempWorryLevel % tempValue);
+                    //tempWorryLevel = Math.Floor(tempWorryLevel / 3);
+                    if (tempWorryLevel % monkey6.divisibleTest == 0)
+                    {
+                        monkey6.TrueMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
+                    }
+                    else
+                    {
+                        monkey6.FalseMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
+                    }
+                    monkey6.inspectItemCount++;
+                }
+                monkey6.items.Clear();
+
+                foreach (var item in monkey7.items)
+                {
+                    tempWorryLevel = eval.Evaluate(item.Value + " " + monkey7.operation + " " + monkey7.operationAmount);
+                    tempWorryLevel = Math.Floor(tempWorryLevel % tempValue);
+                    //tempWorryLevel = Math.Floor(tempWorryLevel / 3);
+                    if (tempWorryLevel % monkey7.divisibleTest == 0)
+                    {
+                        monkey7.TrueMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
+                    }
+                    else
+                    {
+                        monkey7.FalseMonkeyDestinationObject.items.Add(item.Key, tempWorryLevel);
+                    }
+                    monkey7.inspectItemCount++;
+                }
+                monkey7.items.Clear();                      
+
+            }
+
+            List<int> monkeyList = new List<int>();
+            monkeyList.Add(monkey0.inspectItemCount);
+            monkeyList.Add(monkey1.inspectItemCount);
+            monkeyList.Add(monkey2.inspectItemCount);
+            monkeyList.Add(monkey3.inspectItemCount);
+            monkeyList.Add(monkey4.inspectItemCount);
+            monkeyList.Add(monkey5.inspectItemCount);
+            monkeyList.Add(monkey6.inspectItemCount);
+            monkeyList.Add(monkey7.inspectItemCount);
+            monkeyList.Sort();
+            monkeyList.Reverse();
+
+            double topMonkeyA = monkeyList[0];
+            double topMonkeyB = monkeyList[1];
+
+            double monkeyBusiness = topMonkeyA * topMonkeyB;
+
+            output = "Part A: " + monkeyBusiness + " - " + monkeyList[0] + " - " + monkeyList[1] + " - " + monkeyList[2] + " - " + monkeyList[3] + "\n";
             
         }
 
