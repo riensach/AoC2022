@@ -44,31 +44,11 @@ namespace AoC2022.solution
                     } else
                     {
 
-                        /*
-                        if (startY > Int32.Parse(coords[0]) && startX > Int32.Parse(coords[1]))
-                        {
-                            System.Console.WriteLine("hello1");
-                        }
-                         else if (startY < Int32.Parse(coords[0]) && startX < Int32.Parse(coords[1]))
-                        {
-                            System.Console.WriteLine(startY + ","+ startX + ":" + coords[0] + "," + coords[1]);
-                        }
-                        else if (startX > Int32.Parse(coords[1]))
-                        {
-                            //System.Console.WriteLine("hello22");
-                        } else if(startY > Int32.Parse(coords[0]))
-                        {
-                            //System.Console.WriteLine("hello23");
-                        }
-                        */
-
-
                         if(startX > Int32.Parse(coords[1]))
                         {
                             for (int x = Int32.Parse(coords[1]); x <= startX; x++)
                             {
                                 grid[x, startY] = "#";
-                                //System.Console.WriteLine("Updating coord " + x + "," + startY + " to rock");
                             }
 
                         } else if (startX < Int32.Parse(coords[1]))
@@ -76,7 +56,6 @@ namespace AoC2022.solution
                             for (int x = startX; x <= Int32.Parse(coords[1]); x++)
                             {
                                 grid[x, startY] = "#";
-                                //System.Console.WriteLine("Updating coord " + x + "," + startY + " to rock");
                             }
                         }
                         else if (startY > Int32.Parse(coords[0]))
@@ -84,14 +63,12 @@ namespace AoC2022.solution
                             for (int y = Int32.Parse(coords[0]); y <= startY; y++)
                             {
                                 grid[startX, y] = "#";
-                                //System.Console.WriteLine("Updating coord " + startX + "," + y + " to rock");
                             }
                         } else
                         {
                             for (int y = startY; y <= Int32.Parse(coords[0]); y++)
                             {
                                 grid[startX, y] = "#";
-                                //System.Console.WriteLine("Updating coord " + startX + "," + y + " to rock");
                             }
                         }
                                               
