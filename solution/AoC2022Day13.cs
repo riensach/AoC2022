@@ -4,14 +4,74 @@ using System.Diagnostics;
 using System.Text.Json;
 using System.Net.Sockets;
 using Newtonsoft.Json.Linq;
+using System.Reflection;
+using System.Collections.Generic;
+using System.Collections;
 //using System.Text.Json;
 
 
 namespace AoC2022.solution
 {
-    public class AoCDay13
-    {
+
+        public class AoCDay13
+        {
         public List<string> packets = new List<string>();
+        public List<string> packetsOrdered = new List<string>();
+
+
+        public int comparison(JsonElement leftSide, JsonElement rightSide)
+        {
+            JsonElement newComp;
+            switch (leftSide.ValueKind, rightSide.ValueKind)
+            {
+                case (JsonValueKind.Null, not JsonValueKind.Null):
+                    return -1;
+                case (not JsonValueKind.Null, JsonValueKind.Null):
+                    return 1;
+                case (JsonValueKind.Number, JsonValueKind.Number):
+                    if(leftSide.GetInt32() < rightSide.GetInt32())
+                    {
+                        return -1;
+                    } else if (leftSide.GetInt32() > rightSide.GetInt32())
+                    {
+                        return 1;
+                    }
+                    return 0;
+                case (JsonValueKind.Number, JsonValueKind.Array):
+                    newComp = JsonSerializer.Deserialize<JsonElement>("[" + leftSide.GetInt32() + "]");
+                    return comparison(newComp, rightSide);
+                case (JsonValueKind.Array, JsonValueKind.Number):
+                    newComp = JsonSerializer.Deserialize<JsonElement>("[" + rightSide.GetInt32() + "]");
+                    return comparison(leftSide, newComp);
+                case (JsonValueKind.Array, JsonValueKind.Array):
+                    var leftArray = leftSide.EnumerateArray();
+                    var rightArray = rightSide.EnumerateArray();
+
+                    while (leftArray.MoveNext() && rightArray.MoveNext())
+                    {
+                        var leftPants = leftArray.Current;
+                        var rightPants = rightArray.Current;
+
+                        var compair = comparison(leftPants, rightPants);
+
+                        if (compair != 0)
+                        {
+                            return compair;
+                        }
+                    }
+
+                    var legCount = leftArray.Count() - rightArray.Count();
+
+                    return legCount switch
+                    {
+                        0 => 0,
+                        < 0 => -1,
+                        _ => 1
+                    };
+                default:
+                    return 0;
+            }
+        }
 
 
         public AoCDay13(int selectedPart, string input)
@@ -21,190 +81,96 @@ namespace AoC2022.solution
                 StringSplitOptions.None
             );
             int startPacket = 1;
+            int index = 1;
+            int indexSum = 0;
             string tempPacket = "";
-
-
-            
 
             foreach (string line in lines)
             {
-                if(line == "")
+                if (line == "")
                 {
                     startPacket = 1;
                     continue;
                 }
-                if(startPacket == 1)
+                if (startPacket == 1)
                 {
                     startPacket = 0;
                     tempPacket = line;
-                } else
-                {
-                    /*string jString = JsonSerializer.Deserialize<string>(tempPacket)!;
-                    Console.WriteLine(jString);
-                    jString = JsonSerializer.Deserialize<string>(line)!;
-                    Console.WriteLine(jString);
-                    */
-                   // var objects = JArray.Parse(tempPacket); // parse as array  
-                    //Console.WriteLine(objects[0]);
-
-                   // objects = JArray.Parse(line); // parse as array  
-                    //Console.WriteLine(objects[0]);
-                   /* foreach (JObject root in objects)
-                    {
-                        foreach (KeyValuePair<String, JToken> app in root)
-                        {
-                            var appName = app.Key;
-                            var description = (String)app.Value["Description"];
-                            var value = (String)app.Value["Value"];
-
-                            Console.WriteLine(appName);
-                            Console.WriteLine(description);
-                            Console.WriteLine(value);
-                            Console.WriteLine("\n");
-                        }
-                    }
-                    objects = JArray.Parse(line); // parse as array  
-                    foreach (JObject root in objects)
-                    {
-                        foreach (KeyValuePair<String, JToken> app in root)
-                        {
-                            var appName = app.Key;
-                            var description = (String)app.Value["Description"];
-                            var value = (String)app.Value["Value"];
-
-                            Console.WriteLine(appName);
-                            Console.WriteLine(description);
-                            Console.WriteLine(value);
-                            Console.WriteLine("\n");
-                        }
-                    }
-                   */
-                    
-
-                    string tempString = tempPacket + " - " + line;
-                    packets.Add(tempString);
-                }                
-            }
-
-            int index = 1;
-            int indexSum = 0;
-            bool rightOrder = false;
-            foreach (string entry in packets)
-            {
-                // do something with entry.Value or entry.Key
-                string[] packet = entry.Split(" - ");
-                Console.WriteLine(packet[0] + "\n" + packet[1]);
-
-                int countLeftBrackets = packet[0].Split('[').Length - 1;
-                int countRightBrackets = packet[1].Split('[').Length - 1;
-                int countLeftItems = packet[0].Split(',').Length - 1;
-                int countRightItems = packet[1].Split(',').Length - 1;
-                string[] packetOrig = new string[packet.Length];
-                Array.Copy(packet, packetOrig, packet.Length);
-                packet[0] = packet[0].Replace("[", "");
-                packet[0] = packet[0].Replace("]", "");
-                packet[1] = packet[1].Replace("[", "");
-                packet[1] = packet[1].Replace("]", "");
-                string[] leftItems = packet[0].Split(',');
-                string[] rightItems = packet[1].Split(',');
-                int iter = 0;
-                int itemIntLeft;
-                int itemIntRight;
-                bool defWrongOrder = false;
-                bool isNumberLeftFirst = int.TryParse(leftItems[0], out itemIntLeft);
-                bool isNumberRightFirst = int.TryParse(rightItems[0], out itemIntRight);
-
-                int firstCommaLeft = packetOrig[0].IndexOf(',');
-                int firstCommaRight = packetOrig[1].IndexOf(',');
-                string firstBracLeft = "";
-                string firstBracRight = "";
-                //Console.WriteLine(packetOrig[0]);
-                if (firstCommaLeft > 1 && firstCommaRight > 1) {
-                    //Console.WriteLine("dsfdsfsdtem");
-                    firstBracLeft = packetOrig[0].Substring(firstCommaLeft - 2, 2);
-                    firstBracRight = packetOrig[1].Substring(firstCommaRight - 2, 2);
-                }
-                //Console.WriteLine("dsfdsfsdtem - " + firstBracLeft + " - " + firstBracRight);
-                if (!isNumberLeftFirst && !isNumberRightFirst)// && firstBracLeft != "[]" && firstBracRight != "[]")
-                {
-                    leftItems = leftItems.Skip(1).ToArray();
-                    rightItems = rightItems.Skip(1).ToArray();
-                    isNumberLeftFirst = (leftItems.Length > 0) ? int.TryParse(leftItems[0], out itemIntLeft): false;
-                    isNumberRightFirst = (rightItems.Length > 0) ? int.TryParse(rightItems[0], out itemIntRight) : false;
-                    Console.WriteLine("Skipping first item");
-                } 
-                /*if(firstBracLeft == "[]" && firstBracRight == "[]") {
-                    // Right item not found at this point, not in right order
-                    Console.WriteLine("Brackets!");
-                    defWrongOrder = true;
-                    isNumberLeftFirst = false;
-                    isNumberRightFirst = false;
-                }*/
-                if (isNumberLeftFirst)
-                {
-                    foreach (string item in leftItems)
-                    {
-                        if(rightItems.Length - 1 < iter)
-                        {
-                            // Right item not found at this point, not in right order
-                            Console.WriteLine("No comparison right item found.");
-                            defWrongOrder = true;
-                            break;
-                        }
-                        int leftItemInt;
-                        int rightItemInt;
-                        bool isNumberLeft = int.TryParse(item, out leftItemInt);
-                        bool isNumberRight = int.TryParse(rightItems[iter], out rightItemInt);
-                        if (leftItemInt < rightItemInt)
-                        {
-                            // Left side is smaller, inputs are in right order
-                            Console.WriteLine("Left is smaller than right:" + leftItemInt + " - " + rightItemInt);
-                            rightOrder = true;
-                            break;
-                        }
-                        else if (leftItemInt == rightItemInt)
-                        {
-                            iter++;
-                            Console.WriteLine("same - continue: " + leftItemInt + " - " + rightItemInt);
-                            continue;
-                        }
-                        else if (leftItemInt > rightItemInt)
-                        {
-                            // Left side is larger, inputs are NOT in right order
-                            Console.WriteLine("Left item is larger: " + leftItemInt+ " vs " + rightItemInt);
-                            defWrongOrder = true;
-                            break;
-                        }
-                    }
-                    if (countLeftItems < countRightItems && !defWrongOrder)
-                    {
-                        // Left side is smaller, inputs are in right order
-                        Console.WriteLine("Left is smaller than right 2 ");
-                        rightOrder = true;
-                    }
-                } else if(isNumberRightFirst)
-                {
-                    // No number on the left, but there is on the right - so correct order
-
-                    Console.WriteLine("Left ran out of items");
-                    rightOrder = true;
                 }
                 else
                 {
-                    // No items on left list, need to compare breackets
-                }
+                    packets.Add(tempPacket);
+                    packets.Add(line);
+                    JsonElement temp1 = JsonSerializer.Deserialize<JsonElement>(tempPacket);
+                    JsonElement temp2 = JsonSerializer.Deserialize<JsonElement>(line);
+                    int resultFound = comparison(temp1, temp2);
+                    bool rightOrder = false;
 
-                if (rightOrder)
-                {
-                    Console.WriteLine("Correct order at index "+index);
-                    indexSum = indexSum + index;
+                    if (resultFound < 0)
+                    {
+                        rightOrder = true;
+                    }
+
+                    if (rightOrder)
+                    {
+                        indexSum = indexSum + index;
+                    }
+                    index++;
                 }
-                index++;
-                rightOrder = false;
-                defWrongOrder = false;
             }
 
             output = "Part A: " + indexSum;
+
+            packets.Add("[[2]]");
+            packets.Add("[[6]]");
+            packetsOrdered = packets.Select(i => new string(i)).ToList();
+            bool ordered = false;
+            while (ordered == false) {
+                bool correctOrder = true;
+                for (int i = 0; i < packetsOrdered.Count - 1; i++)
+                {
+                    JsonElement packetComp1 = JsonSerializer.Deserialize<JsonElement>(packetsOrdered[i]);
+                    JsonElement packetComp2 = JsonSerializer.Deserialize<JsonElement>(packetsOrdered[i+1]);
+
+                    int resultFound = comparison(packetComp1, packetComp2);
+
+                    if (resultFound >= 0)
+                    {
+                        correctOrder = false;
+                        packetsOrdered.Insert(i + 2, packetsOrdered[i]);
+                        packetsOrdered.RemoveAt(i);
+                    }
+                }
+                for (int i = 0; i < packetsOrdered.Count - 1; i++)
+                {
+                    JsonElement packetComp1 = JsonSerializer.Deserialize<JsonElement>(packetsOrdered[i]);
+                    JsonElement packetComp2 = JsonSerializer.Deserialize<JsonElement>(packetsOrdered[i + 1]);
+
+                    int resultFound = comparison(packetComp1, packetComp2);
+
+                    if (resultFound >= 0)
+                    {
+                        correctOrder = false;
+                        packetsOrdered.Insert(i + 2, packetsOrdered[i]);
+                        packetsOrdered.RemoveAt(i);
+                    }
+                }
+
+
+
+                if (correctOrder == true)
+                {
+                    break;
+                }
+            }
+
+
+            int packet1 = packetsOrdered.FindIndex( x => x.Equals("[[2]]")) + 1;
+            int packet2 = packetsOrdered.FindIndex( x => x.Equals("[[6]]")) + 1;
+
+            int keyValue = packet1 * packet2;
+
+            output += "\nPart B: " + keyValue + ". Index: "+ packet1+ " - "+ packet2;
         }
 
         public string output;
@@ -212,6 +178,3 @@ namespace AoC2022.solution
 }
 
 
-// 5457 = wrong too low
-// 5977 = wrong too high
-// 5760
