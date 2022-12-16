@@ -49,10 +49,10 @@ namespace AoC2022.solution
 
                     while (leftArray.MoveNext() && rightArray.MoveNext())
                     {
-                        var leftPants = leftArray.Current;
-                        var rightPants = rightArray.Current;
+                        var leftArrayItem = leftArray.Current;
+                        var rightArrayItem = rightArray.Current;
 
-                        var compair = comparison(leftPants, rightPants);
+                        var compair = comparison(leftArrayItem, rightArrayItem);
 
                         if (compair != 0)
                         {
@@ -60,9 +60,9 @@ namespace AoC2022.solution
                         }
                     }
 
-                    var legCount = leftArray.Count() - rightArray.Count();
+                    var countItem = leftArray.Count() - rightArray.Count();
 
-                    return legCount switch
+                    return countItem switch
                     {
                         0 => 0,
                         < 0 => -1,
