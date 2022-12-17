@@ -137,7 +137,6 @@ namespace AoC2022.solution
                         // First
                         startRange = startCoord;
                         endRange = endCoord;
-
                     }
                     else if(startCoord > endRange + 1)
                     {
@@ -158,8 +157,7 @@ namespace AoC2022.solution
                             targetX = x;
                             targetY = endRange + 1;
                             break;
-                        }                        
-
+                        }
                     } else
                     {
                         startRange = startCoord;
