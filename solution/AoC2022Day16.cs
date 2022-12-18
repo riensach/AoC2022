@@ -21,9 +21,8 @@ namespace AoC2022.solution
                 StringSplitOptions.None
             );
 
-            int pressureReleased = 0;
 
-
+            int maximumValves = 0;
             foreach (string line in lines)
             {
                 string inputString = line.Replace(" tunnels lead to valves ", "");
@@ -33,9 +32,12 @@ namespace AoC2022.solution
                 string[] parts = inputString.Split(";");
                 string[] firstPart = parts[0].Split("=");
                 string[] secondPart = parts[1].Split(", ");
-
                 string valve = firstPart[0];
                 string flowRate = firstPart[1];
+                if(Int32.Parse(flowRate) > 0)
+                {
+                    maximumValves++;
+                }
                 List<string> tunnels = new List<string>();
                 foreach (string valves in secondPart)
                 {
@@ -49,123 +51,184 @@ namespace AoC2022.solution
                     {
                         valves.Add(tunnels[i], 0);
                     }
-                        
+
                 }
                 Console.Write("\n");
-
                 valvesFlowRate.Add(valve, Int32.Parse(flowRate));
                 valvesTunnels.Add(valve, tunnels);
             }
 
             Random rand = new Random();
-            int startingPressureReleased = 0;
-            int startingMinute = 1;
-            int MaximumPressureReleasedHistory = 0;
-            string startingValve = "AA";
+            int[] minutes = new int[] {30, 26};
+            string[] puzzleParts = new string[] {"A", "B"};
+            int maximumLength = (maximumValves) + (maximumValves * 2);
+            Console.WriteLine("Maximum length: "+ maximumLength);
 
-            //HashSet<string> openedValvesStart = new HashSet<string>();
-            string openedValvesStart = "";
-            valveObject startingValveObject = new valveObject(openedValvesStart, startingValve, startingMinute, startingPressureReleased, startingValve);
-            Queue<valveObject> queue = new Queue<valveObject>();
-            queue.Enqueue(startingValveObject);
-            do
+            for (int h = 0; h < 2; h++)
             {
-                // Queue
-                valveObject currentItem = queue.Dequeue();
-                string currentValve = currentItem.currentValue;
-                string currentValveSecond = currentItem.currentValueSecond;
-                int currentMinute = currentItem.currentMinute;
-                int maximumPressureReleased = currentItem.currentPressureReleased;
-                bool isValveOpen = currentItem.openedValves.Contains(currentValve);
-                int optionCount = valvesTunnels[currentValve].Count();
-                int optionCountSecond = valvesTunnels[currentValveSecond].Count();
-                int optionPermutation = optionCount * optionCountSecond;
-                int currentFlowRate = valvesFlowRate[currentValve];
+                int pressureReleased = 0;
+                int startingPressureReleased = 0;
+                int startingMinute = 1;
+                int MaximumPressureReleasedHistory = 0;
+                string startingValve = "AA";
+                string openedValvesStart = "";
+                valveObject startingValveObject = new valveObject(openedValvesStart, startingValve, startingMinute, startingPressureReleased, startingValve);
+                Queue<valveObject> queue = new Queue<valveObject>();
 
-                if (currentMinute > 30)
+                int maximumMinutes = minutes[h];                
+
+                queue.Enqueue(startingValveObject);
+                do
                 {
-                    continue;
-                }
-                if (maximumPressureReleased > pressureReleased)
-                {
-                    pressureReleased = maximumPressureReleased;
-                }
+                    // Queue
+                    valveObject currentItem = queue.Dequeue();
+                    int currentMinute = currentItem.currentMinute;
+                    int maximumPressureReleased = currentItem.currentPressureReleased;
+                    string currentValveFirst = currentItem.currentValue;
+                    string currentValveSecond = currentItem.currentValueSecond;
+                    bool isValveOpenFirst = currentItem.openedValves.Contains(currentValveFirst);
+                    bool isValveOpenSecond = currentItem.openedValves.Contains(currentValveSecond);
+                    int optionCountFirst = valvesTunnels[currentValveFirst].Count();
+                    int optionCountSecond = valvesTunnels[currentValveSecond].Count();
+                    int currentFlowRateFirst = valvesFlowRate[currentValveFirst];
+                    int currentFlowRateSecond = valvesFlowRate[currentValveSecond];
 
-                if (maximumPressureReleased > MaximumPressureReleasedHistory)
-                {
-                    MaximumPressureReleasedHistory = maximumPressureReleased;
-                }
-                
-                if (currentMinute > 30)
-                {
-                    break;
-                }
+                    if (currentMinute > maximumMinutes)
+                    {
+                        continue;
+                    }
+                    if (maximumPressureReleased > pressureReleased)
+                    {
+                        pressureReleased = maximumPressureReleased;
+                    }
+                    if (maximumPressureReleased > MaximumPressureReleasedHistory)
+                    {
+                        MaximumPressureReleasedHistory = maximumPressureReleased;
+                    }
+                    if (currentMinute > maximumMinutes)
+                    {
+                        break;
+                    }
+                    if (currentMinute > 6 && maximumPressureReleased < 1)
+                    {
+                        // After 12 steps we have no pressure, so no need to go further
+                        continue;
+                    }
+                    if (currentMinute > 7 && maximumPressureReleased < (MaximumPressureReleasedHistory - 1000))
+                    {
+                        // We've released more pressure before, no need to go down this track
+                        continue;
+                    }
+                    if (currentMinute > 8 && maximumPressureReleased < (MaximumPressureReleasedHistory - 500))
+                    {
+                        // We've released more pressure before, no need to go down this track
+                        continue;
+                    }
+                    if (currentMinute > 9 && maximumPressureReleased < (MaximumPressureReleasedHistory - 100))
+                    {
+                        // We've released more pressure before, no need to go down this track
+                        continue;
+                    }
+                    if (currentMinute > 12 && maximumPressureReleased < (MaximumPressureReleasedHistory - 50))
+                    {
+                        // We've released more pressure before, no need to go down this track
+                        continue;
+                    }
+                    if (currentMinute > 14 && maximumPressureReleased < (MaximumPressureReleasedHistory - 50))
+                    {
+                        // We've released more pressure before, no need to go down this track
+                        continue;
+                    }
+                    if (currentMinute > 18 && maximumPressureReleased < (MaximumPressureReleasedHistory - 50))
+                    {
+                        // We've released more pressure before, no need to go down this track
+                        continue;
+                    }
+                    if (currentItem.openedValves.Length == maximumLength)
+                    {
+                        // All the valves are open
+                        continue;
+                    }
+                    if (h == 0)
+                    {
+                        // Part A
+                        for (int i = 0; i < optionCountFirst; i++)
+                        {
+                            string currentValveMovedTo = valvesTunnels[currentValveFirst][i];
+                            string copyOfValves = currentItem.openedValves;
+                            valveObject newValveObject = new valveObject(copyOfValves, currentValveMovedTo, currentMinute + 1, maximumPressureReleased, currentValveSecond);
+                            queue.Enqueue(newValveObject);
+                        }
 
-                if (currentMinute > 12 && maximumPressureReleased < 1)
-                {
-                    // After 12 steps we have no pressure, so no need to go further
-                    continue;
-                }
+                        if (currentFlowRateFirst > 0 && !isValveOpenFirst)
+                        {
+                            // We can open the valve, it's not open
+                            int pressureToRelease = (currentFlowRateFirst * (maximumMinutes - currentMinute));
+                            int NewmaximumPressureReleased = maximumPressureReleased + pressureToRelease;
+                            valveObject newValveObject = new valveObject(currentItem.openedValves + ":" + currentValveFirst, currentValveFirst, currentMinute + 1, NewmaximumPressureReleased, currentValveSecond);
+                            queue.Enqueue(newValveObject);
 
-                if (currentMinute > 14 && maximumPressureReleased < (MaximumPressureReleasedHistory - 700))
-                {
-                    // We've released more pressure before, no need to go down this track
-                    continue;
-                }
+                        }
+                    } else
+                    {
+                        if(currentMinute > 8)
+                        {
+                            Queue<valveObject> queue2 = new Queue<valveObject>(queue.Distinct());
+                            queue = queue2;
+                        }
+                        if(currentFlowRateFirst > 0 && currentFlowRateSecond > 0 && !isValveOpenFirst && !isValveOpenSecond && currentValveFirst != currentValveSecond)
+                        {
+                            // Option to open both valves - simples
+                            int pressureToReleaseFirst = (currentFlowRateFirst * (maximumMinutes - currentMinute));
+                            int pressureToReleaseSecond = (currentFlowRateSecond * (maximumMinutes - currentMinute));
+                            int NewmaximumPressureReleased = maximumPressureReleased + pressureToReleaseFirst + pressureToReleaseSecond;
+                            valveObject newValveObject = new valveObject(currentItem.openedValves + ":" + currentValveFirst + ":" + currentValveSecond, currentValveFirst, currentMinute + 1, NewmaximumPressureReleased, currentValveSecond);
+                            queue.Enqueue(newValveObject);
+                        } 
+                        if (currentFlowRateFirst > 0 && !isValveOpenFirst)
+                        {
+                            // We can open the first valve, so we need all the permutations of open first valve + second person moves
+                            int pressureToRelease = (currentFlowRateFirst * (maximumMinutes - currentMinute));
+                            int NewmaximumPressureReleased = maximumPressureReleased + pressureToRelease;
+                            for (int i = 0; i < optionCountSecond; i++)
+                            {
+                                string currentValveMovedToSecond = valvesTunnels[currentValveSecond][i];
+                                valveObject newValveObject = new valveObject(currentItem.openedValves + ":" + currentValveFirst, currentValveFirst, currentMinute + 1, NewmaximumPressureReleased, currentValveMovedToSecond);
+                                queue.Enqueue(newValveObject);
+                            }
+                        } 
+                        if (currentFlowRateSecond > 0 && !isValveOpenSecond)
+                        {
+                            // We can open the second valve, so we need all the permutations of open second valve + first person moves
+                            int pressureToRelease = (currentFlowRateSecond * (maximumMinutes - currentMinute));
+                            int NewmaximumPressureReleased = maximumPressureReleased + pressureToRelease;
+                            for (int i = 0; i < optionCountFirst; i++)
+                            {
+                                string currentValveMovedToFirst = valvesTunnels[currentValveFirst][i];
+                                valveObject newValveObject = new valveObject(currentItem.openedValves + ":" + currentValveSecond, currentValveMovedToFirst, currentMinute + 1, NewmaximumPressureReleased, currentValveSecond);
+                                queue.Enqueue(newValveObject);
+                            }
+                        }
 
-                if (currentMinute > 17 && maximumPressureReleased < (MaximumPressureReleasedHistory - 250))
-                {
-                    // We've released more pressure before, no need to go down this track
-                    continue;
-                }
+                        for (int q = 0; q < optionCountFirst; q++)
+                        {
+                            for (int w = 0; w < optionCountSecond; w++)
+                            {
+                                string currentValveMovedToFirst = valvesTunnels[currentValveFirst][q];
+                                string copyOfValves = currentItem.openedValves;
+                                string currentValveMovedToSecond = valvesTunnels[currentValveSecond][w];
+                                valveObject newValveObject = new valveObject(copyOfValves, currentValveMovedToFirst, currentMinute + 1, maximumPressureReleased, currentValveMovedToSecond);
+                                queue.Enqueue(newValveObject);
+                            }
+                        }
 
-                if (currentMinute > 19 && maximumPressureReleased < (MaximumPressureReleasedHistory-150))
-                {
-                    // We've released more pressure before, no need to go down this track
-                    continue;
-                }
+                    }
 
-                for (int i = 0; i < optionPermutation; i++)
-                {
-                    string currentValveMovedTo = valvesTunnels[currentValve][i];
-                    //HashSet<String> copyOfValves = new HashSet<String>(currentItem.openedValves);
-                    string copyOfValves = currentItem.openedValves;
-                    valveObject newValveObject = new valveObject(copyOfValves, currentValveMovedTo, currentMinute + 1, maximumPressureReleased, currentValveSecond);
-                    queue.Enqueue(newValveObject);
+                } while (queue.Count > 0);
 
-
-                }
-
-                if (currentFlowRate > 0 && !isValveOpen)
-                {
-                    // We can open the valve, it's not open
-                    int pressureToRelease = (currentFlowRate * (30 - currentMinute));
-                    int NewmaximumPressureReleased = maximumPressureReleased + pressureToRelease;
-                    //HashSet<String> copyOfValves = new HashSet<String>(currentItem.openedValves);
-                    //copyOfValves.Add(currentValve);
-                    //string copyOfValves = currentItem.openedValves + ":" + currentValve;
-                    
-
-                    valveObject newValveObject = new valveObject(currentItem.openedValves + ":" + currentValve, currentValve, currentMinute + 1, NewmaximumPressureReleased, currentValveSecond);
-                    //var containsObjection = queue.Any(o => o.openedValves == copyOfValves && o.currentValue == currentValve && o.currentMinute == (currentMinute + 1) && o.currentPressureReleased == maximumPressureReleased);
-                    
-                    //if (!queue.Contains(newValveObject))// && !containsObjection)
-                    //{
-                        queue.Enqueue(newValveObject);
-                    //}
-
-                }
-
-                //Queue<valveObject> queue2 = new Queue<valveObject>(queue.Distinct());
-                //queue = queue2;
-
-
-            } while (queue.Count > 0);
-
-            output = "Part A: X:" + pressureReleased;
-            //output += "\n Actions taken: \n" + maximumActionPath;
+                Console.WriteLine("\nPart "+ puzzleParts[h] + ": Maximum Pressure Released over "+ minutes[h] + " minutes:" + pressureReleased+"\n");
+            }
         }
-
         public string output;
     }
 
@@ -193,7 +256,7 @@ namespace AoC2022.solution
         public bool Equals(valveObject y)
         {
             //if (Enumerable.SequenceEqual(openedValves,y.openedValves) && currentValue.Equals(y.currentValue) && currentMinute.Equals(y.currentMinute) && currentPressureReleased.Equals(y.currentPressureReleased))
-            if (openedValves.Equals(y.openedValves) && currentValue.Equals(y.currentValue) && currentMinute.Equals(y.currentMinute) && currentPressureReleased.Equals(y.currentPressureReleased))
+            if (openedValves.Equals(y.openedValves) && currentValue.Equals(y.currentValue) && currentMinute.Equals(y.currentMinute) && currentPressureReleased.Equals(y.currentPressureReleased) && currentValueSecond.Equals(y.currentValueSecond))
             {
                 return true;
             }
@@ -210,6 +273,7 @@ namespace AoC2022.solution
                 int hash = 17;
                 hash = hash * 23 + (openedValves ?? "").GetHashCode();
                 hash = hash * 23 + (currentValue ?? "").GetHashCode();
+                hash = hash * 23 + (currentValueSecond ?? "").GetHashCode();
                 hash = hash * 23 + currentMinute.GetHashCode();
                 hash = hash * 23 + currentPressureReleased.GetHashCode();
 
@@ -219,33 +283,4 @@ namespace AoC2022.solution
 
     }
 
-
-    public class valveObjectComparer : IEqualityComparer<valveObject>
-    {
-        public bool Equals(valveObject x, valveObject y)
-        {
-            if (x.openedValves.Equals(y.openedValves) && x.currentValue.Equals(y.currentValue) && x.currentMinute.Equals(y.currentMinute) && x.currentPressureReleased.Equals(y.currentPressureReleased))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public int GetHashCode(valveObject obj)
-        {
-            unchecked
-            {
-                int hash = 17;
-                hash = hash * 23 + obj.openedValves.GetHashCode();
-                hash = hash * 23 + (obj.currentValue ?? "").GetHashCode(); 
-                hash = hash * 23 + obj.currentMinute.GetHashCode();
-                hash = hash * 23 + obj.currentPressureReleased.GetHashCode();
-
-                return hash;
-            }
-        }
-    }
 }

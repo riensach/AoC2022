@@ -24,7 +24,7 @@ namespace AoC2022.solution
             );
 
             int highestX = 0;
-            int lowestX = 0;
+            int lowestX = 2000000;
             int y = 2000000;
 
             foreach (string line in lines)
@@ -96,10 +96,10 @@ namespace AoC2022.solution
                     
             }
 
-
+            Console.WriteLine("Part A: " + noBeaconCount);
             output = "Part A: " + noBeaconCount;
 
-            BigInteger tuningFrequency = 0;            
+            long tuningFrequency = 0;            
             int targetX = 0;
             int targetY = 0;
             for (int x = 0; x <= 4000000; x++)
@@ -167,7 +167,7 @@ namespace AoC2022.solution
 
             }
 
-            tuningFrequency = (4000000 * targetX) + targetY;
+            tuningFrequency = (4000000L * targetX) + targetY;
 
             output += "\nPart B: X:" + targetX + " Y:" + targetY + " - frequency: " + tuningFrequency;           
 
