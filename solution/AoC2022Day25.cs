@@ -14,6 +14,8 @@ namespace AoC2022.solution
             Trace.AutoFlush = true;
             Trace.WriteLine("Starting Calculator Log");
             Trace.WriteLine(string.Format("Started {0}", DateTime.Now.ToString()));
+
+            output = "Part A:";
         }
 
         public string output;
