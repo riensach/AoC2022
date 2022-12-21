@@ -22,7 +22,7 @@ namespace AoC2022.solution
 
             bool foundMonkeyB = false;
             long increaseDelta = 1000000000;
-            long integer = 1000000000;
+            long integer = 1000;
             int lastDirection = 0;
             while(foundMonkeyB == false)
             {
