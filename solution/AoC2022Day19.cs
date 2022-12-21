@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Diagnostics;
+using System.Linq;
 
 namespace AoC2022.solution
 {
@@ -32,7 +33,6 @@ namespace AoC2022.solution
 
                 string[] parts = inputString.Split(":");
                 int blueprintID = Int32.Parse(parts[0]);
-                int blueprintID = Int32.Parse(parts[0]);
                 int oreRobotOreCost = Int32.Parse(parts[1]);
                 int clayRobotOreCost = Int32.Parse(parts[2]);
                 string[] obsidianRobotCosts = parts[3].Split(",");
@@ -54,37 +54,48 @@ namespace AoC2022.solution
                 geodeRobotCost.Add("obsidian", geodeRobotObsidianCost);
 
 
-                Blueprint newBlueprint = new Blueprint(blueprintID, oreRobotCost, clayRobotCost, obsidianRobotCost, geodeRobotCost, minutesToRun);
+                Blueprint newBlueprint = new Blueprint(blueprintID, oreRobotCost, clayRobotCost, obsidianRobotCost, geodeRobotCost, 0);
                 blueprintsLists.Add(newBlueprint);
             }
 
-            
 
+            /*
             foreach(Blueprint blueprintObject in blueprintsLists)
             {
-                runBlueprint(blueprintObject, minutesToRun);
-                int openedGeodesMax = blueprintObject.geodeCount;
-                blueprintObject.qualityLevel = blueprintObject.geodeCount * blueprintObject.blueprintID;
+                int qualityLevel = runBlueprintA(blueprintObject, minutesToRun);
+                //int openedGeodesMax = blueprintObject.geodeCount;
+                //blueprintObject.qualityLevel = blueprintObject.geodeCount * blueprintObject.blueprintID;
 
-                Console.WriteLine("opened geodes: " + blueprintObject.geodeCount);
+                Console.WriteLine("Quality level for blueprint: " + qualityLevel);
 
-                if (openedGeodesMax > maximumGeodesOpen)
-                {
-                    maximumGeodesOpen = openedGeodesMax;
-                    maximumGeodesBlueprintID = blueprintObject.blueprintID;
-                }
-
-                sumQualityLevels = sumQualityLevels + blueprintObject.qualityLevel;
-                break;
+                sumQualityLevels = sumQualityLevels + qualityLevel;
+                //break;
 
             }
 
             Console.WriteLine("Part A: " + sumQualityLevels);
+            */
+
+            
+
+            int sumMaxGeodes = 0;
+            minutesToRun = 32;
+
+            int maxGeodes1 = runBlueprintB(blueprintsLists.Find(x => x.blueprintID == 1), minutesToRun);
+            int maxGeodes2 = runBlueprintB(blueprintsLists.Find(x => x.blueprintID == 2), minutesToRun);
+            int maxGeodes3 = runBlueprintB(blueprintsLists.Find(x => x.blueprintID == 3), minutesToRun);
+
+            sumMaxGeodes = maxGeodes1 * maxGeodes2 * maxGeodes3;
+
+
+            Console.WriteLine("Part B: " + sumMaxGeodes);
+            
+
         }
 
 
 
-        public void runBlueprint(Blueprint bluprintObject, int minutesToRun)
+        public int runBlueprintA(Blueprint bluprintObject, int minutesToRunTotal)
         {
 
             int maximumGeodes = 0;
@@ -94,90 +105,253 @@ namespace AoC2022.solution
             {
                 // JUST HERE
                 Blueprint currentItem = queue.Dequeue();
-                for (int i = 1; i <= minutesToRun; i++)
+                if(currentItem.minutesToRun > minutesToRunTotal)
                 {
-                    string debugText = "";
-                    debugText += "Day " + i;
-
-                    int oreRobotCount = bluprintObject.oreRobotCount;
-                    int clayRobotCount = bluprintObject.clayRobotCount;
-                    int obsidianRobotCount = bluprintObject.obsidianRobotCount;
-                    int geodeRobotCount = bluprintObject.geodeRobotCount;
-                    // Can I build a Geode Robot?
-                    if (bluprintObject.oreCount >= bluprintObject.geodeRobotCost["ore"] && bluprintObject.obsidianCount >= bluprintObject.geodeRobotCost["obsidian"])
-                    {
-                        // Yes I can!
-                        //debugText += "\nBuilding a Geode Robot.";
-                        bluprintObject.oreCount = bluprintObject.oreCount - bluprintObject.geodeRobotCost["ore"];
-                        bluprintObject.obsidianCount = bluprintObject.obsidianCount - bluprintObject.geodeRobotCost["obsidian"];
-                        bluprintObject.geodeRobotCount = bluprintObject.geodeRobotCount + 1;
-                    }
-                    else
-                    // Can I build a Obsedian Robot?
-                    if (bluprintObject.oreCount >= bluprintObject.obsidianRobotCost["ore"] && bluprintObject.clayCount >= bluprintObject.obsidianRobotCost["clay"])
-                    {
-                        // Yes I can!
-                        //debugText += "\nBuilding a Obsedian Robot.";
-                        bluprintObject.oreCount = bluprintObject.oreCount - bluprintObject.obsidianRobotCost["ore"];
-                        bluprintObject.clayCount = bluprintObject.clayCount - bluprintObject.obsidianRobotCost["clay"];
-                        bluprintObject.obsidianRobotCount = bluprintObject.obsidianRobotCount + 1;
-                    }
-                    else
-                    // Can I build a Clay Robot?
-                    if (bluprintObject.oreCount >= bluprintObject.clayRobotCost["ore"])
-                    {
-                        // Yes I can!
-                        //debugText += "\nBuilding a Clay Robot.";
-                        bluprintObject.oreCount = bluprintObject.oreCount - bluprintObject.clayRobotCost["ore"];
-                        bluprintObject.clayRobotCount = bluprintObject.clayRobotCount + 1;
-                    }
-                    else
-                    // Can I build a Ore Robot?
-                    if (bluprintObject.oreCount >= bluprintObject.oreRobotCost["ore"])
-                    {
-                        // Yes I can!
-                        //debugText += "\nBuilding a Ore Robot.";
-                        bluprintObject.oreCount = bluprintObject.oreCount - bluprintObject.oreRobotCost["ore"];
-                        bluprintObject.oreRobotCount = bluprintObject.oreRobotCount + 1;
-                    }
-
-
-                    if (oreRobotCount > 0)
-                    {
-                        bluprintObject.oreCount = bluprintObject.oreCount + oreRobotCount;
-                        debugText += "\n" + oreRobotCount + " Ore robots increased Ore to " + bluprintObject.oreCount;
-                    }
-                    if (clayRobotCount > 0)
-                    {
-                        bluprintObject.clayCount = bluprintObject.clayCount + clayRobotCount;
-                        debugText += "\n" + clayRobotCount + " Clay robots increased Clay to " + bluprintObject.clayCount;
-                    }
-                    if (obsidianRobotCount > 0)
-                    {
-                        bluprintObject.obsidianCount = bluprintObject.obsidianCount + obsidianRobotCount;
-                        debugText += "\n" + obsidianRobotCount + " Obsidian robots increased Obsidian to " + bluprintObject.obsidianCount;
-                    }
-                    if (geodeRobotCount > 0)
-                    {
-                        bluprintObject.geodeCount = bluprintObject.geodeCount + geodeRobotCount;
-                        debugText += "\n" + geodeRobotCount + " Geode increased Geode to " + bluprintObject.geodeCount;
-                    }
-
-
-                    debugText += "\n";
-                    Console.WriteLine(debugText);
+                    continue;
+                }
+                if (currentItem.minutesToRun >= 7 && currentItem.oreRobotCount < 1)
+                {
+                    continue;
+                }
+                if (currentItem.minutesToRun >= 7 && currentItem.clayRobotCount < 1)
+                {
+                    continue;
+                }
+                if (currentItem.minutesToRun >= (minutesToRunTotal - 3) && currentItem.obsidianRobotCount < 1)
+                {
+                    continue;
+                }
+                if (currentItem.minutesToRun >= (minutesToRunTotal - 1) && currentItem.geodeRobotCount < 1)
+                {
+                    continue;
+                }
+                if (currentItem.minutesToRun >= minutesToRunTotal && currentItem.geodeCount < 1)
+                {
+                    continue;
                 }
 
-            } while (queue.Count > 0);
+                if (currentItem.minutesToRun >= 18 && maximumGeodes > 0 && currentItem.geodeCount < (maximumGeodes - (minutesToRunTotal - currentItem.minutesToRun)))
+                {
+                    continue;
+                }
 
+                if (currentItem.geodeCount> maximumGeodes)
+                {
+                    maximumGeodes = currentItem.geodeCount;
+                }
+                // 778 = too low
+                int oreRobotCount = currentItem.oreRobotCount;
+                int clayRobotCount = currentItem.clayRobotCount;
+                int obsidianRobotCount = currentItem.obsidianRobotCount;
+                int geodeRobotCount = currentItem.geodeRobotCount;
+                currentItem.minutesToRun = currentItem.minutesToRun + 1;
+
+                Blueprint newRecord;
+                // Can I build a Geode Robot?
+                if (currentItem.oreCount >= currentItem.geodeRobotCost["ore"] && currentItem.obsidianCount >= currentItem.geodeRobotCost["obsidian"] && currentItem.minutesToRun <= (minutesToRunTotal - 1))
+                {
+                    // Yes I can!
+                    newRecord = currentItem with { };
+                    newRecord.oreCount = newRecord.oreCount - newRecord.geodeRobotCost["ore"];
+                    newRecord.obsidianCount = newRecord.obsidianCount - newRecord.geodeRobotCost["obsidian"];
+                    newRecord.geodeRobotCount = newRecord.geodeRobotCount + 1;
+                    newRecord.oreCount = newRecord.oreCount + oreRobotCount;
+                    newRecord.clayCount = newRecord.clayCount + clayRobotCount;
+                    newRecord.obsidianCount = newRecord.obsidianCount + obsidianRobotCount;
+                    newRecord.geodeCount = newRecord.geodeCount + geodeRobotCount;
+                    queue.Enqueue(newRecord);
+                }
+                    
+                // Can I build a Obsedian Robot?
+                if (currentItem.oreCount >= currentItem.obsidianRobotCost["ore"] && currentItem.clayCount >= currentItem.obsidianRobotCost["clay"] && currentItem.minutesToRun <= (minutesToRunTotal - 3))
+                {
+                    // Yes I can!
+                    newRecord = currentItem with { };
+                    newRecord.oreCount = newRecord.oreCount - newRecord.obsidianRobotCost["ore"];
+                    newRecord.clayCount = newRecord.clayCount - newRecord.obsidianRobotCost["clay"];
+                    newRecord.obsidianRobotCount = newRecord.obsidianRobotCount + 1;
+                    newRecord.oreCount = newRecord.oreCount + oreRobotCount;
+                    newRecord.clayCount = newRecord.clayCount + clayRobotCount;
+                    newRecord.obsidianCount = newRecord.obsidianCount + obsidianRobotCount;
+                    newRecord.geodeCount = newRecord.geodeCount + geodeRobotCount;
+                    queue.Enqueue(newRecord);
+                }
+                
+                // Can I build a Clay Robot?
+                if (currentItem.oreCount >= currentItem.clayRobotCost["ore"] && currentItem.minutesToRun <= (minutesToRunTotal - 5) && currentItem.oreCount < 10)
+                {
+                    // Yes I can!
+                    newRecord = currentItem with { };
+                    newRecord.oreCount = newRecord.oreCount - newRecord.clayRobotCost["ore"];
+                    newRecord.clayRobotCount = newRecord.clayRobotCount + 1;
+                    newRecord.oreCount = newRecord.oreCount + oreRobotCount;
+                    newRecord.clayCount = newRecord.clayCount + clayRobotCount;
+                    newRecord.obsidianCount = newRecord.obsidianCount + obsidianRobotCount;
+                    newRecord.geodeCount = newRecord.geodeCount + geodeRobotCount;
+                    queue.Enqueue(newRecord);
+                }
+                
+                // Can I build a Ore Robot?
+                if (currentItem.oreCount >= currentItem.oreRobotCost["ore"] && currentItem.minutesToRun <= (minutesToRunTotal - 5) && currentItem.oreCount < 10)
+                {
+                    // Yes I can!
+                    newRecord = currentItem with { };
+                    newRecord.oreCount = newRecord.oreCount - newRecord.oreRobotCost["ore"];
+                    newRecord.oreRobotCount = newRecord.oreRobotCount + 1;
+                    newRecord.oreCount = newRecord.oreCount + oreRobotCount;
+                    newRecord.clayCount = newRecord.clayCount + clayRobotCount;
+                    newRecord.obsidianCount = newRecord.obsidianCount + obsidianRobotCount;
+                    newRecord.geodeCount = newRecord.geodeCount + geodeRobotCount;
+                    queue.Enqueue(newRecord);
+                }
+                currentItem.oreCount = currentItem.oreCount + oreRobotCount;
+                currentItem.clayCount = currentItem.clayCount + clayRobotCount;
+                currentItem.obsidianCount = currentItem.obsidianCount + obsidianRobotCount;
+                currentItem.geodeCount = currentItem.geodeCount + geodeRobotCount;
+                newRecord = currentItem with { };
+                queue.Enqueue(newRecord);
+
+
+            } while (queue.Count > 0);
+            int qualityLevel = maximumGeodes * bluprintObject.blueprintID;
+            Console.WriteLine("Returning blueprint ID " + bluprintObject.blueprintID + " with a total number of open Geodes of " + maximumGeodes + " so that's a quality level of " + qualityLevel);
+            return qualityLevel;
+
+
+
+        }
+
+
+
+
+        public int runBlueprintB(Blueprint bluprintObject, int minutesToRunTotal)
+        {
+
+            int maximumGeodes = 0;
+            Queue<Blueprint> queue = new Queue<Blueprint>();
+            queue.Enqueue(bluprintObject);
+            do
+            {
+                // JUST HERE
+                Blueprint currentItem = queue.Dequeue();
+                if (currentItem.minutesToRun > minutesToRunTotal)
+                {
+                    continue;
+                }
+                if (currentItem.minutesToRun >= 7 && currentItem.oreRobotCount < 1)
+                {
+                    continue;
+                }
+                if (currentItem.minutesToRun >= 9 && currentItem.clayRobotCount < 1)
+                {
+                    continue;
+                }
+                if (currentItem.minutesToRun >= (minutesToRunTotal - 3) && currentItem.obsidianRobotCount < 1)
+                {
+                    continue;
+                }
+                if (currentItem.minutesToRun >= (minutesToRunTotal - 1) && currentItem.geodeRobotCount < 1)
+                {
+                    continue;
+                }
+                if (currentItem.minutesToRun >= minutesToRunTotal && currentItem.geodeCount < 1)
+                {
+                    continue;
+                }
+
+                if (currentItem.minutesToRun >= 18 && maximumGeodes > 0 && currentItem.geodeCount < maximumGeodes - (minutesToRunTotal - currentItem.minutesToRun))
+                {
+                    continue;
+                }
+
+                if (currentItem.geodeCount > maximumGeodes)
+                {
+                    maximumGeodes = currentItem.geodeCount;
+                }
+                // 778 = too low
+                int oreRobotCount = currentItem.oreRobotCount;
+                int clayRobotCount = currentItem.clayRobotCount;
+                int obsidianRobotCount = currentItem.obsidianRobotCount;
+                int geodeRobotCount = currentItem.geodeRobotCount;
+                currentItem.minutesToRun = currentItem.minutesToRun + 1;
+
+                Blueprint newRecord;
+                // Can I build a Geode Robot?
+                if (currentItem.oreCount >= currentItem.geodeRobotCost["ore"] && currentItem.obsidianCount >= currentItem.geodeRobotCost["obsidian"] && currentItem.minutesToRun <= (minutesToRunTotal - 1))
+                {
+                    // Yes I can!
+                    newRecord = currentItem with { };
+                    newRecord.oreCount = newRecord.oreCount - newRecord.geodeRobotCost["ore"];
+                    newRecord.obsidianCount = newRecord.obsidianCount - newRecord.geodeRobotCost["obsidian"];
+                    newRecord.geodeRobotCount = newRecord.geodeRobotCount + 1;
+                    newRecord.oreCount = newRecord.oreCount + oreRobotCount;
+                    newRecord.clayCount = newRecord.clayCount + clayRobotCount;
+                    newRecord.obsidianCount = newRecord.obsidianCount + obsidianRobotCount;
+                    newRecord.geodeCount = newRecord.geodeCount + geodeRobotCount;
+                    queue.Enqueue(newRecord);
+                }
+
+                // Can I build a Obsedian Robot?
+                if (currentItem.oreCount >= currentItem.obsidianRobotCost["ore"] && currentItem.clayCount >= currentItem.obsidianRobotCost["clay"] && currentItem.minutesToRun <= (minutesToRunTotal - 3))
+                {
+                    // Yes I can!
+                    newRecord = currentItem with { };
+                    newRecord.oreCount = newRecord.oreCount - newRecord.obsidianRobotCost["ore"];
+                    newRecord.clayCount = newRecord.clayCount - newRecord.obsidianRobotCost["clay"];
+                    newRecord.obsidianRobotCount = newRecord.obsidianRobotCount + 1;
+                    newRecord.oreCount = newRecord.oreCount + oreRobotCount;
+                    newRecord.clayCount = newRecord.clayCount + clayRobotCount;
+                    newRecord.obsidianCount = newRecord.obsidianCount + obsidianRobotCount;
+                    newRecord.geodeCount = newRecord.geodeCount + geodeRobotCount;
+                    queue.Enqueue(newRecord);
+                }
+
+                // Can I build a Clay Robot?
+                if (currentItem.oreCount >= currentItem.clayRobotCost["ore"] && currentItem.minutesToRun <= (minutesToRunTotal - 5) && currentItem.oreCount < 10)
+                {
+                    // Yes I can!
+                    newRecord = currentItem with { };
+                    newRecord.oreCount = newRecord.oreCount - newRecord.clayRobotCost["ore"];
+                    newRecord.clayRobotCount = newRecord.clayRobotCount + 1;
+                    newRecord.oreCount = newRecord.oreCount + oreRobotCount;
+                    newRecord.clayCount = newRecord.clayCount + clayRobotCount;
+                    newRecord.obsidianCount = newRecord.obsidianCount + obsidianRobotCount;
+                    newRecord.geodeCount = newRecord.geodeCount + geodeRobotCount;
+                    queue.Enqueue(newRecord);
+                }
+
+                // Can I build a Ore Robot?
+                if (currentItem.oreCount >= currentItem.oreRobotCost["ore"] && currentItem.minutesToRun <= (minutesToRunTotal - 5) && currentItem.oreCount < 10)
+                {
+                    // Yes I can!
+                    newRecord = currentItem with { };
+                    newRecord.oreCount = newRecord.oreCount - newRecord.oreRobotCost["ore"];
+                    newRecord.oreRobotCount = newRecord.oreRobotCount + 1;
+                    newRecord.oreCount = newRecord.oreCount + oreRobotCount;
+                    newRecord.clayCount = newRecord.clayCount + clayRobotCount;
+                    newRecord.obsidianCount = newRecord.obsidianCount + obsidianRobotCount;
+                    newRecord.geodeCount = newRecord.geodeCount + geodeRobotCount;
+                    queue.Enqueue(newRecord);
+                }
+                currentItem.oreCount = currentItem.oreCount + oreRobotCount;
+                currentItem.clayCount = currentItem.clayCount + clayRobotCount;
+                currentItem.obsidianCount = currentItem.obsidianCount + obsidianRobotCount;
+                currentItem.geodeCount = currentItem.geodeCount + geodeRobotCount;
+                newRecord = currentItem with { };
+                queue.Enqueue(newRecord);
+
+
+            } while (queue.Count > 0);
             
-            
+            Console.WriteLine("Returning blueprint ID " + bluprintObject.blueprintID + " with a total number of open Geodes of " + maximumGeodes);
+            return maximumGeodes;
+
         }
 
         public string output;
     }
 
-    public class Blueprint
+    public record Blueprint
     {
         //public IDictionary<string, int> valves = new Dictionary<string, int>();
         //public HashSet<string> openedValves = new HashSet<string>();
