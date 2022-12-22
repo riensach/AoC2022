@@ -72,17 +72,17 @@ namespace AoC2022.solution
                 //break;
 
             }
-
+            
             Console.WriteLine("Part A: " + sumQualityLevels);
             */
 
-            
+
 
             int sumMaxGeodes = 0;
             minutesToRun = 32;
 
-            int maxGeodes1 = runBlueprintB(blueprintsLists.Find(x => x.blueprintID == 1), minutesToRun);
-            int maxGeodes2 = runBlueprintB(blueprintsLists.Find(x => x.blueprintID == 2), minutesToRun);
+            int maxGeodes1 = 8;// runBlueprintB(blueprintsLists.Find(x => x.blueprintID == 1), minutesToRun);
+            int maxGeodes2 = 37;//runBlueprintB(blueprintsLists.Find(x => x.blueprintID == 2), minutesToRun);
             int maxGeodes3 = runBlueprintB(blueprintsLists.Find(x => x.blueprintID == 3), minutesToRun);
 
             sumMaxGeodes = maxGeodes1 * maxGeodes2 * maxGeodes3;
@@ -93,7 +93,8 @@ namespace AoC2022.solution
 
         }
 
-
+        // 9176 too low
+        // 9472 wrong
 
         public int runBlueprintA(Blueprint bluprintObject, int minutesToRunTotal)
         {
@@ -105,15 +106,28 @@ namespace AoC2022.solution
             {
                 // JUST HERE
                 Blueprint currentItem = queue.Dequeue();
-                if(currentItem.minutesToRun > minutesToRunTotal)
+                int totalRobotCount = currentItem.oreRobotCount + currentItem.clayRobotCount + currentItem.obsidianRobotCount + currentItem.geodeRobotCount;
+                if (currentItem.minutesToRun > minutesToRunTotal)
                 {
                     continue;
                 }
-                if (currentItem.minutesToRun >= 7 && currentItem.oreRobotCount < 1)
+                if (currentItem.minutesToRun >= 5 && totalRobotCount < 2)
                 {
                     continue;
                 }
-                if (currentItem.minutesToRun >= 7 && currentItem.clayRobotCount < 1)
+
+                if (currentItem.minutesToRun >= 9 && totalRobotCount < 3)
+                {
+                    continue;
+                }
+
+                if (currentItem.minutesToRun >= 15 && totalRobotCount < 4)
+                {
+                    continue;
+                }
+
+
+                if (currentItem.minutesToRun >= 8 && currentItem.clayRobotCount < 1)
                 {
                     continue;
                 }
@@ -125,12 +139,12 @@ namespace AoC2022.solution
                 {
                     continue;
                 }
-                if (currentItem.minutesToRun >= minutesToRunTotal && currentItem.geodeCount < 1)
+                if (currentItem.minutesToRun >= (minutesToRunTotal - 1) && currentItem.geodeCount < 1 && currentItem.geodeRobotCount < 1)
                 {
                     continue;
                 }
 
-                if (currentItem.minutesToRun >= 18 && maximumGeodes > 0 && currentItem.geodeCount < (maximumGeodes - (minutesToRunTotal - currentItem.minutesToRun)))
+                if (currentItem.minutesToRun >= 15 && maximumGeodes > 0 && currentItem.geodeCount < (maximumGeodes - (minutesToRunTotal - currentItem.minutesToRun)))
                 {
                     continue;
                 }
@@ -234,15 +248,99 @@ namespace AoC2022.solution
             {
                 // JUST HERE
                 Blueprint currentItem = queue.Dequeue();
+                int totalRobotCount = currentItem.oreRobotCount + currentItem.clayRobotCount + currentItem.obsidianRobotCount + currentItem.geodeRobotCount;
+                int totalRobotCountOreClay = currentItem.oreRobotCount + currentItem.clayRobotCount;
+
+                if (currentItem.clayRobotCount > 10)
+                {
+                    continue;
+                }
+                if (currentItem.oreRobotCount > 6)
+                {
+                    continue;
+                }
+
+                if (totalRobotCountOreClay > 17)
+                {
+                    continue;
+                }
+
+                if (currentItem.obsidianRobotCount > 9)
+                {
+                    continue;
+                }
+
                 if (currentItem.minutesToRun > minutesToRunTotal)
                 {
                     continue;
                 }
-                if (currentItem.minutesToRun >= 7 && currentItem.oreRobotCount < 1)
+                if (currentItem.minutesToRun >= 7 && totalRobotCount < 2)
                 {
                     continue;
                 }
-                if (currentItem.minutesToRun >= 9 && currentItem.clayRobotCount < 1)
+
+                if (currentItem.minutesToRun >= 10 && totalRobotCount < 3)
+                {
+                    continue;
+                }
+
+                if (currentItem.minutesToRun >= 11 && totalRobotCountOreClay < 3)
+                {
+                    continue;
+                }
+
+                if (currentItem.minutesToRun >= 16 && totalRobotCountOreClay < 4)
+                {
+                    continue;
+                }
+
+                if (currentItem.minutesToRun >= 18 && totalRobotCount < 4)
+                {
+                    continue;
+                }
+
+                if (currentItem.minutesToRun >= 22 && totalRobotCount < 5)
+                {
+                    continue;
+                }
+
+                if (currentItem.minutesToRun >= 27 && totalRobotCount < 6)
+                {
+                    continue;
+                }
+
+                if (currentItem.minutesToRun >= 32 && totalRobotCount < 7)
+                {
+                    continue;
+                }
+                if (currentItem.minutesToRun >= 30 && currentItem.geodeRobotCount < 1)
+                {
+                    continue;
+                }
+
+                if (currentItem.minutesToRun >= 8 && currentItem.clayRobotCount < 1)
+                {
+                    continue;
+                }
+                if (currentItem.minutesToRun >= 17 && currentItem.obsidianRobotCount < 1)
+                {
+                    continue;
+                }
+                if (currentItem.minutesToRun >= 23 && currentItem.obsidianRobotCount < 2)
+                {
+                    continue;
+                }
+                if (currentItem.minutesToRun >= 23 && currentItem.geodeRobotCount < 1)
+                {
+                    continue;
+                }
+
+                if (currentItem.minutesToRun >= 27 && currentItem.geodeRobotCount < 2)
+                {
+                    continue;
+                }
+
+                if (currentItem.minutesToRun >= 30 && currentItem.obsidianRobotCount < 3)
                 {
                     continue;
                 }
@@ -254,15 +352,24 @@ namespace AoC2022.solution
                 {
                     continue;
                 }
-                if (currentItem.minutesToRun >= minutesToRunTotal && currentItem.geodeCount < 1)
+                if (currentItem.minutesToRun >= (minutesToRunTotal - 1) && currentItem.geodeCount < 1 && currentItem.geodeRobotCount < 1)
                 {
                     continue;
                 }
 
-                if (currentItem.minutesToRun >= 18 && maximumGeodes > 0 && currentItem.geodeCount < maximumGeodes - (minutesToRunTotal - currentItem.minutesToRun))
+                if (currentItem.minutesToRun >= 20 && maximumGeodes > 0 && currentItem.geodeCount < (maximumGeodes - (minutesToRunTotal - currentItem.minutesToRun)))
                 {
                     continue;
                 }
+
+                if (currentItem.minutesToRun >= 22)
+                {
+                   // Queue<Blueprint> queue2 = new Queue<Blueprint>(queue.Distinct());
+                   // queue = queue2;
+                }
+                // 7992 too low
+                // 9176 too low
+                // 9472 wrong
 
                 if (currentItem.geodeCount > maximumGeodes)
                 {
@@ -379,7 +486,61 @@ namespace AoC2022.solution
             geodeRobotCost = geodeRobotCostInput;
             minutesToRun = minutesToRunInput;
         }
+
+        /*
+        public override bool Equals(object? other)
+        {
+            return this.oreRobotCount.Equals(other?.oreRobotCount)
+                && this.clayRobotCount.Equals(other?.clayRobotCount)
+                && this.obsidianRobotCount.Equals(other?.obsidianRobotCount)
+                && this.geodeRobotCount.Equals(other?.geodeRobotCount)
+                && this.oreCount.Equals(other?.oreCount)
+                && this.clayCount.Equals(other?.clayCount)
+                && this.obsidianCount.Equals(other?.obsidianCount)
+                && this.geodeCount.Equals(other?.geodeCount)
+                && this.minutesToRun.Equals(other?.minutesToRun);
+        }
+
+        
+                public override bool Equals(object? obj)
+                {
+                    return Equals((Blueprint)obj);
+                }
+                public bool Equals(Blueprint y)
+                {
+                    //if (Enumerable.SequenceEqual(openedValves,y.openedValves) && currentValue.Equals(y.currentValue) && currentMinute.Equals(y.currentMinute) && currentPressureReleased.Equals(y.currentPressureReleased))
+                    if (oreRobotCount.Equals(y.oreRobotCount) && clayRobotCount.Equals(y.clayRobotCount) && obsidianRobotCount.Equals(y.obsidianRobotCount) && geodeRobotCount.Equals(y.geodeRobotCount) && oreCount.Equals(y.oreCount)
+                         && clayCount.Equals(y.clayCount) && geodeCount.Equals(y.geodeCount) && obsidianCount.Equals(y.obsidianCount) && minutesToRun.Equals(y.minutesToRun))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+
+                public override int GetHashCode()
+                {
+                    unchecked
+                    {
+                        int hash = 17;
+                        hash = hash * 23 + oreRobotCount.GetHashCode();
+                        hash = hash * 23 + clayRobotCount.GetHashCode();
+                        hash = hash * 23 + obsidianRobotCount.GetHashCode();
+                        hash = hash * 23 + geodeRobotCount.GetHashCode();
+                        hash = hash * 23 + oreCount.GetHashCode();
+                        hash = hash * 23 + clayCount.GetHashCode();
+                        hash = hash * 23 + obsidianCount.GetHashCode();
+                        hash = hash * 23 + geodeCount.GetHashCode();
+                        hash = hash * 23 + geodeCount.GetHashCode();
+                        hash = hash * 23 + minutesToRun.GetHashCode();
+
+                        return hash;
+                    }
+                }*/
     }
 
 
-    }
+}
