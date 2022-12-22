@@ -81,9 +81,9 @@ namespace AoC2022.solution
             int sumMaxGeodes = 0;
             minutesToRun = 32;
 
-            int maxGeodes1 = 8;// runBlueprintB(blueprintsLists.Find(x => x.blueprintID == 1), minutesToRun);
-            int maxGeodes2 = 37;//runBlueprintB(blueprintsLists.Find(x => x.blueprintID == 2), minutesToRun);
-            int maxGeodes3 = runBlueprintB(blueprintsLists.Find(x => x.blueprintID == 3), minutesToRun);
+            int maxGeodes1 = 8;// runBlueprintB(blueprintsLists.Find(x => x.blueprintID == 1), minutesToRun); // 8
+            int maxGeodes2 = 37;// runBlueprintB(blueprintsLists.Find(x => x.blueprintID == 2), minutesToRun); // 37
+            int maxGeodes3 = runBlueprintB(blueprintsLists.Find(x => x.blueprintID == 3), minutesToRun); // 32
 
             sumMaxGeodes = maxGeodes1 * maxGeodes2 * maxGeodes3;
 
@@ -242,6 +242,8 @@ namespace AoC2022.solution
         {
 
             int maximumGeodes = 0;
+            int[] maxGeodesInt;
+            maxGeodesInt = new int[35];
             Queue<Blueprint> queue = new Queue<Blueprint>();
             queue.Enqueue(bluprintObject);
             do
@@ -250,8 +252,16 @@ namespace AoC2022.solution
                 Blueprint currentItem = queue.Dequeue();
                 int totalRobotCount = currentItem.oreRobotCount + currentItem.clayRobotCount + currentItem.obsidianRobotCount + currentItem.geodeRobotCount;
                 int totalRobotCountOreClay = currentItem.oreRobotCount + currentItem.clayRobotCount;
+                if(currentItem.geodeCount > 0 && currentItem.geodeCount >= maxGeodesInt[currentItem.minutesToRun])
+                {
+                    maxGeodesInt[currentItem.minutesToRun] = currentItem.geodeCount;
+                } else if(currentItem.geodeCount > 0)
+                {
+                    // Got more geode's earlier, so end
+                    continue;
+                }
 
-                if (currentItem.clayRobotCount > 10)
+                if (currentItem.clayRobotCount > 8)
                 {
                     continue;
                 }
@@ -260,12 +270,12 @@ namespace AoC2022.solution
                     continue;
                 }
 
-                if (totalRobotCountOreClay > 17)
+                if (totalRobotCountOreClay > 12)
                 {
                     continue;
                 }
 
-                if (currentItem.obsidianRobotCount > 9)
+                if (currentItem.obsidianRobotCount > 6)
                 {
                     continue;
                 }
@@ -332,12 +342,12 @@ namespace AoC2022.solution
                 }
                 if (currentItem.minutesToRun >= 23 && currentItem.geodeRobotCount < 1)
                 {
-                    continue;
+                   // continue;
                 }
 
-                if (currentItem.minutesToRun >= 27 && currentItem.geodeRobotCount < 2)
+                if (currentItem.minutesToRun >= 26 && currentItem.geodeRobotCount < 2)
                 {
-                    continue;
+                    //continue;
                 }
 
                 if (currentItem.minutesToRun >= 30 && currentItem.obsidianRobotCount < 3)
