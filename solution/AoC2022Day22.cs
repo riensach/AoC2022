@@ -616,81 +616,81 @@ namespace AoC2022.solution
 
                             Console.WriteLine("Sending from cube " + currentCube + " to cube " + cubeToGoToInt);
 
-                            if ((facing == "U" || facing == "D") && cubeToGoToDirection == "R")
+                            if ((facing == "U" || facing == "D") && cubeToGoToDirection == "R") // Yes
                             {
                                 // Need to invert the X/Y axis
 
-                                newLandingX = landingCubeEndingX - gapFromLeft;
+                                newLandingX = landingCubeStartingX + gapFromLeft;
                                 newLandingY = landingCubeStartingY;
-                                Console.WriteLine("Sending from " + currentX + "," + currentY + " to " + newLandingX + "," + newLandingY + " :: 1 - " + gapFromLeft + "," + gapFromTop);
+                                Console.WriteLine("Sending from " + currentX + "," + currentY + " to " + newLandingX + "," + newLandingY + " :: 1 - " + gapFromLeft + "," + gapFromTop + " :: " + facing + " : " + cubeToGoToDirection);
                             }
-                            else if ((facing == "U" || facing == "D") && cubeToGoToDirection == "L")
+                            else if ((facing == "U" || facing == "D") && cubeToGoToDirection == "L") // Yes
                             {
                                 // Need to invert the X/Y axis
 
-                                newLandingX = landingCubeEndingX - gapFromLeft;
+                                newLandingX = landingCubeStartingX + gapFromLeft;
                                 newLandingY = landingCubeEndingY;
-                                Console.WriteLine("Sending from " + currentX + "," + currentY + " to " + newLandingX + "," + newLandingY + " :: 2 - " + gapFromLeft + "," + gapFromTop);
+                                Console.WriteLine("Sending from " + currentX + "," + currentY + " to " + newLandingX + "," + newLandingY + " :: 2 - " + gapFromLeft + "," + gapFromTop + " :: " + facing + " : " + cubeToGoToDirection);
                             }
-                            else if ((facing == "L" || facing == "R") && cubeToGoToDirection == "U")
-                            {
-                                // Need to invert the X/Y axis
-
-                                newLandingX = landingCubeStartingX;
-                                newLandingY = landingCubeEndingY - gapFromTop;
-                                Console.WriteLine("Sending from " + currentX + "," + currentY + " to " + newLandingX + "," + newLandingY + " :: 3 - " + gapFromLeft + "," + gapFromTop);
-                            }
-                            else if ((facing == "L" || facing == "R") && cubeToGoToDirection == "D")
+                            else if ((facing == "L" || facing == "R") && cubeToGoToDirection == "U") // Yes
                             {
                                 // Need to invert the X/Y axis
 
                                 newLandingX = landingCubeEndingX;
-                                newLandingY = landingCubeEndingY - gapFromTop;
-                                Console.WriteLine("Sending from " + currentX + "," + currentY + " to " + newLandingX + "," + newLandingY + " :: 4 - " + gapFromLeft + "," + gapFromTop);
+                                newLandingY = landingCubeStartingY + gapFromTop;
+                                Console.WriteLine("Sending from " + currentX + "," + currentY + " to " + newLandingX + "," + newLandingY + " :: 3 - " + gapFromLeft + "," + gapFromTop + " :: " + facing + " : " + cubeToGoToDirection);
                             }
-                            else if ((facing == "L" || facing == "R") && cubeToGoToDirection == "L")
+                            else if ((facing == "L" || facing == "R") && cubeToGoToDirection == "D") // Yes
+                            {
+                                // Need to invert the X/Y axis
+
+                                newLandingX = landingCubeStartingX;
+                                newLandingY = landingCubeStartingY + gapFromTop;
+                                Console.WriteLine("Sending from " + currentX + "," + currentY + " to " + newLandingX + "," + newLandingY + " :: 4 - " + gapFromLeft + "," + gapFromTop + " :: " + facing + " : " + cubeToGoToDirection);
+                            }
+                            else if ((facing == "L" || facing == "R") && cubeToGoToDirection == "L") // Yes
                             {
                                 // Straight convert
 
-                                newLandingX = landingCubeEndingX - gapFromTop;
+                                newLandingX = landingCubeStartingX + gapFromTop;
                                 newLandingY = landingCubeEndingY;
-                                Console.WriteLine("Sending from " + currentX + "," + currentY + " to " + newLandingX + "," + newLandingY + " :: 5 - " + gapFromLeft + "," + gapFromTop);
+                                Console.WriteLine("Sending from " + currentX + "," + currentY + " to " + newLandingX + "," + newLandingY + " :: 5 - " + gapFromLeft + "," + gapFromTop + " :: " + facing + " : " + cubeToGoToDirection);
                             }
-                            else if ((facing == "L" || facing == "R") && cubeToGoToDirection == "R")
+                            else if ((facing == "L" || facing == "R") && cubeToGoToDirection == "R") // Yes
                             {
                                 // Straight convert
 
-                                newLandingX = landingCubeEndingX - gapFromTop;
+                                newLandingX = landingCubeStartingX + gapFromTop;
                                 newLandingY = landingCubeStartingY;
-                                Console.WriteLine("Sending from " + currentX + "," + currentY + " to " + newLandingX + "," + newLandingY + " :: 6 - " + gapFromLeft + "," + gapFromTop);
+                                Console.WriteLine("Sending from " + currentX + "," + currentY + " to " + newLandingX + "," + newLandingY + " :: 6 - " + gapFromLeft + "," + gapFromTop + " :: " + facing + " : " + cubeToGoToDirection);
                             }
-                            else if ((facing == "U" || facing == "D") && cubeToGoToDirection == "U")
+                            else if ((facing == "U" || facing == "D") && cubeToGoToDirection == "U") // Yes
                             {
                                 // Straight convert
 
                                 newLandingX = landingCubeEndingX;
-                                newLandingY = landingCubeEndingY - gapFromLeft;
-                                Console.WriteLine("Sending from " + currentX + "," + currentY + " to " + newLandingX + "," + newLandingY + " :: 7 - " + gapFromLeft + "," + gapFromTop);
+                                newLandingY = landingCubeStartingY + gapFromLeft;
+                                Console.WriteLine("Sending from " + currentX + "," + currentY + " to " + newLandingX + "," + newLandingY + " :: 7 - " + gapFromLeft + "," + gapFromTop + " :: " + facing + " : " + cubeToGoToDirection);
                             }
-                            else if ((facing == "U" || facing == "D") && cubeToGoToDirection == "D")
+                            else if ((facing == "U" || facing == "D") && cubeToGoToDirection == "D") // Yes
                             {
                                 // Straight convert
 
                                 newLandingX = landingCubeStartingX;
-                                newLandingY = landingCubeStartingY - gapFromLeft;
-                                Console.WriteLine("Sending from " + currentX + "," + currentY + " to " + newLandingX + "," + newLandingY + " :: 8 - " + gapFromLeft + "," + gapFromTop);
+                                newLandingY = landingCubeStartingY + gapFromLeft;
+                                Console.WriteLine("Sending from " + currentX + "," + currentY + " to " + newLandingX + "," + newLandingY + " :: 8 - " + gapFromLeft + "," + gapFromTop + " :: " + facing + " : " + cubeToGoToDirection);
                             }
 
 
                             // HERE - figure out if we can land here
-
+                            //Console.WriteLine(grid[newLandingX, newLandingY]);
                             if (grid[newLandingX, newLandingY] == "#")
                             {
                                 // Hit a wall, can't do this, so break;
                                 hitWall = true;
                                 break;
                             }
-
+                            //Console.WriteLine("Moved");
                             // Otherwise we assume we're legit, so we land
                             currentX = newLandingX;
                             currentY = newLandingY;
@@ -712,6 +712,10 @@ namespace AoC2022.solution
 
             // 159039 = too high
             // 159036 = too high
+            // 111335 = wrong
+            // 19526 = too low
+            // 190184
+            // 21308 wrong
             calculateScore = 0;
             facingValue = 0;
             if (facing == "L")
