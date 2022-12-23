@@ -6,7 +6,7 @@ namespace AoC2022.solution
 {
     public class AoCDay24
     {
-
+        List<string> input;
         public AoCDay24(int selectedPart, string input)
         {
             StreamWriter logFile = File.CreateText("day24.log");
