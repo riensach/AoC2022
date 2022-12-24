@@ -1,68 +1,132 @@
 ﻿using System;
 using System.IO;
 using System.Diagnostics;
-using System.Text;
+using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace AoC2022.solution
 {
-    public class Blizzard
-    {
-        public int x;
-        public int y;
-        public string direction;
-        public Blizzard(int xInput, int yInput, string directionInput)
-        {
-            x = xInput;
-            y = yInput;
-            direction = directionInput;
-        }
-    }
 
-    public class Traveller
-    {
-        public int x;
-        public int y;
-        public int targetX;
-        public int targetY;
-        public int steps;
-        public int waitCount;
-        public bool finished = false;
-        public bool toRemove = false;
-        public Traveller(int xInput, int yInput, int targetXInput, int targetYInput, int stepsInput, int waitCountInput)
-        {
-            x = xInput;
-            y = yInput;
-            targetX = targetXInput;
-            targetY = targetYInput;
-            steps = stepsInput;
-            waitCount = waitCountInput;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return Equals((Traveller)obj);
-        }
-        public bool Equals(Traveller y)
-        {
-            //if (Enumerable.SequenceEqual(openedValves,y.openedValves) && currentValue.Equals(y.currentValue) && currentMinute.Equals(y.currentMinute) && currentPressureReleased.Equals(y.currentPressureReleased))
-            if (x.Equals(y.x) && y.Equals(y.y) && steps.Equals(y.steps))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-    }
     public class AoCDay24
     {
-        public string[,] grid;
-        public string[,] emptyGrid;
-        public IDictionary<string, int> shortestPathReference = new Dictionary<string, int>();
-        public IDictionary<int, string> cubes = new Dictionary<int, string>();
-        public List<Blizzard> blizzards = new List<Blizzard>();
-        public List<Traveller> travellers = new List<Traveller>();
+
+        public class Map
+        {
+            public string[] mapLines;
+            public readonly int width;
+            public readonly int length;
+            public Map(string[] input, int lengthInput, int widthInput)
+            {
+                mapLines = input;
+                length = lengthInput;
+                width = widthInput;
+            }
+
+            public string getGridState(int steps, Position position)
+            {
+                if (position.x == 0 && position.y == 1)
+                {
+                    // Starting position!
+                    return ".";
+                }
+
+                if (position.x == length - 1 && position.y == width - 2)
+                {
+                    // Destination position!
+                    return ".";
+                }
+
+                if (position.x <= 0 || position.x >= length - 1 || position.y <= 0 || position.y >= width - 1)
+                {
+                    // Out of range!
+                    return "#";
+                }
+                // If we've got this far, we now need to calculate blizzard movements relative to time
+                var leftBlizzard = (position.y - 1 - steps + 1000 * (width - 2)) % (width - 2) + 1;
+                var rightBlizzard = (position.y - 1 + steps + 1000 * (width - 2)) % (width - 2) + 1;
+                var upBlizzard = (position.x - 1 - steps + 1000 * (length - 2)) % (length - 2) + 1;
+                var downBlizzard = (position.x - 1 + steps + 1000 * (length - 2)) % (length - 2) + 1;
+                /*Console.WriteLine(position.x + " - " + leftBlizzard);
+                Console.WriteLine(position.x + " - " + rightBlizzard);
+                Console.WriteLine(position.y + " - " + upBlizzard);
+                Console.WriteLine(position.y + " - " + downBlizzard + " - " + steps);*/
+                if (
+                    mapLines[position.x][leftBlizzard] == '>' ||
+                    mapLines[position.x][rightBlizzard] == '<' ||
+                    mapLines[upBlizzard][position.y] == 'v' ||
+                    mapLines[downBlizzard][position.y] == '^'
+                )
+                {
+                    return "#";
+                }
+                else
+                {
+                    return ".";
+                }
+
+            }
+        }
+        public record Explorer(int steps, Position position);
+        public record Position(int x, int y);
+
+        public Explorer findThePath(Map map, Explorer explorerInformation, Position targetPosition)
+        {
+            var queue = new PriorityQueue<Explorer, int>();
+
+            int f(Explorer explorer)
+            {
+                // estimate the remaining step count with Manhattan distance
+                var dist =
+                    Math.Abs(targetPosition.x - explorer.position.x) +
+                    Math.Abs(targetPosition.y - explorer.position.y);
+                return explorer.steps + dist;
+            }
+
+            queue.Enqueue(explorerInformation, f(explorerInformation));
+            HashSet<Explorer> previousExplorers = new HashSet<Explorer>();
+
+            while (queue.Count > 0)
+            {
+                var explorer = queue.Dequeue();
+                if (explorer.position == targetPosition)
+                {
+                    return explorer;
+                }
+
+                foreach (var explorerOption in movementOptions(explorer, map))
+                {
+                    if (!previousExplorers.Contains(explorerOption))
+                    {
+                        previousExplorers.Add(explorerOption);
+                        queue.Enqueue(explorerOption, f(explorerOption));
+                    }
+                }
+            }
+            throw new Exception();
+        }
+
+        IEnumerable<Explorer> movementOptions(Explorer explorer, Map map)
+        {
+            foreach (var position in new Position[]{
+            explorer.position,
+            explorer.position with {x=explorer.position.x -1},
+            explorer.position with {x=explorer.position.x +1},
+            explorer.position with {y=explorer.position.y -1},
+            explorer.position with {y=explorer.position.y +1},
+        })
+            {
+                //Console.WriteLine("At position " + explorer.position.x + "," + explorer.position.y + " and looking for our options after " + explorer.steps + " steps");
+                //Console.WriteLine(map.getGridState(explorer.steps + 1, position));
+                if (map.getGridState(explorer.steps + 1, position) == ".")
+                {
+                    yield return explorer with
+                    {
+                        steps = explorer.steps + 1,
+                        position = position
+                    };
+                }
+            }
+        }
 
         public AoCDay24(int selectedPart, string input)
         {
@@ -71,300 +135,26 @@ namespace AoC2022.solution
                 StringSplitOptions.None
             );
 
-            int arrayLength = lines.Count();
-            int arrayWidth = lines[0].Count();
-            grid = new string[arrayLength, arrayWidth];
-            emptyGrid = new string[arrayLength, arrayWidth];
-            createGrid(arrayLength, arrayWidth);
+            int arrayLength = lines.Length;
+            int arrayWidth = lines[0].Length;
 
-            int iteratorX = 0;
-            int iteratorY = 0;
-            int entranceX = 0;
-            int entranceY = 0;
-            int exitX = 0;
-            int exitY = 0;
-            Blizzard blizzard;
-            Traveller startingTraveller;
-            Traveller newTraveller;
-            foreach (string line in lines)
-            {
-                string[] parts = line.Split(",");
+            Map maps = new Map(lines, arrayLength, arrayWidth);
+            var startingLocation = new Position(0, 1);
+            var targetLocation = new Position(arrayLength - 1, arrayWidth - 2);
+            Console.WriteLine(targetLocation.ToString());
 
-                foreach (var character in line)
-                {
+            var explorerInfo = new Explorer(0, startingLocation);
+            var shortestPathExplorer = findThePath(maps, explorerInfo, targetLocation);
+            output = "Part A:" + shortestPathExplorer.steps;
 
-                    grid[iteratorX, iteratorY] = character.ToString();
-                    emptyGrid[iteratorX, iteratorY] = character.ToString();
-                    if(grid[iteratorX, iteratorY] != "#")
-                    {
-                        emptyGrid[iteratorX, iteratorY] = ".";
-                    }
+            shortestPathExplorer = findThePath(maps, explorerInfo, targetLocation);
+            shortestPathExplorer = findThePath(maps, shortestPathExplorer, startingLocation);
+            shortestPathExplorer = findThePath(maps, shortestPathExplorer, targetLocation);
 
-                    if (iteratorX == arrayLength-1 && character.ToString() == ".")
-                    {
-                        //Exit
-                        exitX = iteratorX;
-                        exitY = iteratorY;
-                        //grid[iteratorX, iteratorY] = "Y";
-                        //traveller = new Traveller(iteratorX, iteratorY);
-                        //travellers.Add(traveller);
-                    }
-                    if (iteratorX == 0 && character.ToString() == ".")
-                    {
-                        //Entrance
-                        entranceX = iteratorX;
-                        entranceY = iteratorY;
-                        //grid[iteratorX, iteratorY] = "X";
-                    }
+            var totalTime = shortestPathExplorer.steps;
 
-                    if(character.ToString() == "^" || character.ToString() == "v" || character.ToString() == "<" || character.ToString() == ">")
-                    {
-                        // Blizard
-                        blizzard = new Blizzard(iteratorX, iteratorY, character.ToString());
-                        blizzards.Add(blizzard);
-                        grid[iteratorX, iteratorY] = character.ToString();
-                    }
-                    iteratorY++;
-                }
+            output += "\nPart B:" + totalTime;
 
-                iteratorX++;
-                iteratorY = 0;
-            }
-
-            Console.WriteLine("Starting at "+ entranceX+","+ entranceY + " with a target of "+ exitX + ","+ exitY);
-
-            startingTraveller = new Traveller(entranceX, entranceY, exitX, exitY, 0, 0);
-            travellers.Add(startingTraveller);
-
-
-            Console.WriteLine(printGrid(arrayLength, arrayWidth));
-            
-
-
-            int minimumSteps = 10000000;
-            int iteratorCount = 1;
-            bool finished = false;
-
-            while (!finished) {
-                Array.Copy(emptyGrid, grid, emptyGrid.Length);
-                // Update Blizzards
-                foreach (Blizzard blizzardObj in blizzards)
-                {
-                    int newBlizzardX = 0;
-                    int newBlizzardY = 0;
-                    if(blizzardObj.direction == "<")
-                    {
-                        newBlizzardX = blizzardObj.x;
-                        newBlizzardY = blizzardObj.y - 1;
-                        if(grid[newBlizzardX, newBlizzardY] == "#")
-                        {
-                            // Hit a wall, time to reset 
-                            newBlizzardY = arrayWidth-2;
-                        }
-                    } else if (blizzardObj.direction == ">")
-                    {
-                        newBlizzardX = blizzardObj.x;
-                        newBlizzardY = blizzardObj.y + 1;
-                        if (grid[newBlizzardX, newBlizzardY] == "#")
-                        {
-                            // Hit a wall, time to reset 
-                            newBlizzardY = 1;
-                        }
-                    } else if (blizzardObj.direction == "^")
-                    {
-                        newBlizzardX = blizzardObj.x - 1;
-                        newBlizzardY = blizzardObj.y;
-                        if (grid[newBlizzardX, newBlizzardY] == "#")
-                        {
-                            // Hit a wall, time to reset 
-                            newBlizzardX = arrayLength - 2;
-                        }
-                    } else if (blizzardObj.direction == "v")
-                    {
-                        newBlizzardX = blizzardObj.x + 1;
-                        newBlizzardY = blizzardObj.y;
-                        if (grid[newBlizzardX, newBlizzardY] == "#")
-                        {
-                            // Hit a wall, time to reset 
-                            newBlizzardX = 1;
-                        }
-                    }
-                    //Console.WriteLine("Updating blizzard " + blizzardObj.x + "," + blizzardObj.y + " to " + newBlizzardX + "," + newBlizzardY);
-                    //grid[blizzardObj.x, blizzardObj.y] = ".";
-                    blizzardObj.x = newBlizzardX;
-                    blizzardObj.y = newBlizzardY;
-                    grid[newBlizzardX, newBlizzardY] = blizzardObj.direction;
-                }
-                List<Traveller> travellersToRemove = new List<Traveller>();
-                List<Traveller> travellersToAdd = new List<Traveller>();
-                foreach (Traveller travellerObj in travellers)
-                {
-                    // Skip finished travellers
-                    if (travellerObj.finished)
-                    {
-                        continue;
-                    }
-                    StringBuilder currentLocation = new StringBuilder("", 10);
-                    currentLocation.Append(travellerObj.x);
-                    currentLocation.Append(",");
-                    currentLocation.Append(travellerObj.y);
-                    //string currentLocation = travellerObj.x + "," + travellerObj.y;
-                    if(!shortestPathReference.ContainsKey(currentLocation.ToString()))
-                    {
-                        shortestPathReference.Add(currentLocation.ToString(), travellerObj.steps);
-                    } else if (shortestPathReference[currentLocation.ToString()] > travellerObj.steps)
-                    {
-                        shortestPathReference[currentLocation.ToString()] = travellerObj.steps;
-                    } else if (shortestPathReference[currentLocation.ToString()] < travellerObj.steps - 10)
-                    {
-                        // We made it here for less steps, kill this one.
-                        //Console.WriteLine("Killing slow paths");
-                        travellerObj.toRemove = true;
-                        //travellersToRemove.Add(travellerObj);
-                        continue;
-                    }
-
-                    if(travellerObj.waitCount > 10)
-                    {
-                        travellerObj.toRemove = true;
-                        //travellersToRemove.Add(travellerObj);
-                        continue;
-                    }
-                        
-                    // First, check if anyone made the end
-                    if (travellerObj.x == travellerObj.targetX && travellerObj.y == travellerObj.targetY)
-                    {
-                        travellerObj.finished = true;
-                        if(travellerObj.steps < minimumSteps)
-                        {
-                            minimumSteps = travellerObj.steps;
-                        }
-                        //Console.WriteLine("Finished in steps: " + travellerObj.steps);
-                        continue;
-                    }
-                    // Check right
-                    if(grid[travellerObj.x, travellerObj.y + 1] == ".")
-                    {
-                        // Need to create a new traveller
-                        newTraveller = new Traveller(travellerObj.x, travellerObj.y+1, travellerObj.targetX, travellerObj.targetY, travellerObj.steps + 1, 0);
-                        travellersToAdd.Add(newTraveller);
-                       
-                    }
-                    // Check left
-                    if (grid[travellerObj.x, travellerObj.y - 1] == ".")
-                    {
-
-                        // Need to create a new traveller
-                        newTraveller = new Traveller(travellerObj.x, travellerObj.y - 1, travellerObj.targetX, travellerObj.targetY, travellerObj.steps + 1, 0);
-                        travellersToAdd.Add(newTraveller);
-                        
-                    }
-                    // Check down
-                    if (grid[travellerObj.x + 1, travellerObj.y] == ".")
-                    {
-
-                        // Need to create a new traveller
-                        newTraveller = new Traveller(travellerObj.x + 1, travellerObj.y, travellerObj.targetX, travellerObj.targetY, travellerObj.steps + 1, 0);
-                        travellersToAdd.Add(newTraveller);
-                        
-                    }
-                    // Check up
-                    if (travellerObj.x != 0 && travellerObj.x != 1)
-                    {
-                        if (grid[travellerObj.x - 1, travellerObj.y]==".")
-                        {
-                            // Need to create a new traveller
-                            newTraveller = new Traveller(travellerObj.x - 1, travellerObj.y, travellerObj.targetX, travellerObj.targetY, travellerObj.steps + 1, 0);
-                            travellersToAdd.Add(newTraveller);
-                        }
-                    }
-                    // Check current!
-                    if (grid[travellerObj.x, travellerObj.y] == ".")
-                    {
-                        // We can wait
-                        travellerObj.waitCount = travellerObj.waitCount + 1;
-                        travellerObj.steps = travellerObj.steps + 1;
-                    } else
-                    {
-                        // This traveller object has run it's course
-                        travellerObj.toRemove = true;
-                        //travellersToRemove.Add(travellerObj);
-                    }
-                    
-                }
-                int removed = travellers.RemoveAll(travellerObj => travellerObj.toRemove == true);
-                Console.WriteLine(removed);
-                removed = travellers.RemoveAll(travellerObj => travellerObj.steps > (shortestPathReference[travellerObj.x + ","+ travellerObj.y])+10);
-                Console.WriteLine(removed);
-                travellers.Distinct();//.RemoveAll(travellerObj => travellerObj.steps > minimumSteps);
-                Console.WriteLine(travellers.Count());
-                /*foreach (Traveller travellerObj in travellersToRemove)
-                {
-                    travellers.Remove(travellerObj);
-                }
-                */
-                foreach (Traveller travellerObj in travellersToAdd)
-                {
-                    travellers.Add(travellerObj);
-                }
-                if(minimumSteps < 10000000)
-                {
-                    travellers.RemoveAll(travellerObj => travellerObj.steps > minimumSteps);
-                    travellers.RemoveAll(travellerObj => travellerObj.finished == true) ;
-                }
-                if(travellers.Count < 1)
-                {
-                    finished = true;
-                }
-                //Console.WriteLine("Grid after " + iteratorCount + " minutes:");
-                //Console.WriteLine(printGrid(arrayLength, arrayWidth));
-                iteratorCount++;
-                    //break;
-                    // Try to move
-
-                } 
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            output = "Part A: minimum steps taken: " + minimumSteps;
-        }
-
-        public string printGrid(int xSize, int ySize)
-        {
-            string output = "\nGrid:\n";
-            for (int x = 0; x < xSize; x++)
-            {
-                for (int y = 0; y < ySize; y++)
-                {
-                    string toWrite = grid[x, y];
-                    output += "" + toWrite;
-                }
-                output += "\n";
-            }
-            return output;
-        }
-
-        public void createGrid(int xSize, int ySize)
-        {
-            for (int x = 0; x < xSize; x++)
-            {
-                for (int y = 0; y < ySize; y++)
-                {
-                    grid[x, y] = ".";
-                }
-            }
         }
 
         public string output;
