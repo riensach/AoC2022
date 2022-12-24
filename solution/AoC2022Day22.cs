@@ -595,7 +595,6 @@ namespace AoC2022.solution
                         else if (!validCoord || gridValue != "#" || gridValue == "X")
                         {
                             // We need to do a wrap
-                            bool hitWall = false;
                             // First, what cube are we in?
                             int currentCube = 0;
 
@@ -636,7 +635,6 @@ namespace AoC2022.solution
                             int landingCubeEndingX = int.Parse(landingCubeCoords[2]);
                             int landingCubeEndingY = int.Parse(landingCubeCoords[3]);
 
-                            bool validLandingLocation = false;
                             int newLandingX = 0;
                             int newLandingY = 0;
 
@@ -725,7 +723,6 @@ namespace AoC2022.solution
                             if (grid[newLandingX, newLandingY] == "#")
                             {
                                 // Hit a wall, can't do this, so break;
-                                hitWall = true;
                                 //Console.WriteLine("HIT WALL ON WRAP");
                                 break;
                             }
