@@ -105,7 +105,7 @@ namespace AoC2022.solution
             }
         }
     }*/
-    public class AoCDay24
+    public class AoCDay24b
     {
         public string[,] grid;
         public string[,] emptyGrid;
@@ -114,7 +114,7 @@ namespace AoC2022.solution
         public List<Blizzard> blizzards = new List<Blizzard>();
         public List<Traveller> travellers = new List<Traveller>();
 
-        public AoCDay24(int selectedPart, string input)
+        public AoCDay24b(int selectedPart, string input)
         {
             string[] lines = input.Split(
                 new string[] { Environment.NewLine },
