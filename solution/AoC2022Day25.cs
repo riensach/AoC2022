@@ -8,9 +8,10 @@ namespace AoC2022.solution
 {   
     public class AoCDay25
     {
-        public string[,] grid;
-        public IDictionary<string, string> cubeTransitions = new Dictionary<string, string>();
-        public IDictionary<int, string> cubes = new Dictionary<int, string>();
+        public long sumNumber = 0;
+        public List<long> fuelRequirements = new List<long>();
+        public IDictionary<char, int> SNAFU = new Dictionary<char, int>();
+
         public AoCDay25(int selectedPart, string input)
         {
             string[] lines = input.Split(
@@ -18,51 +19,69 @@ namespace AoC2022.solution
                 StringSplitOptions.None
             );
 
-
-            int arrayLength = lines.Count();
-            int arrayWidth = lines[0].Count();
-            //Console.WriteLine(arrayLength + "," + arrayWidth);
-            grid = new string[arrayLength, arrayWidth];
-            createGrid(arrayLength, arrayWidth);
-            int iteratorX = 0;
-            int iteratorY = 0;
-            int startingX = 0;
-            int startingY = 0;
+            SNAFU.Add('2', 2);
+            SNAFU.Add('1', 1);
+            SNAFU.Add('0', 0);
+            SNAFU.Add('-', -1);
+            SNAFU.Add('=', -2);
 
             foreach (string line in lines)
             {
-
+                long fuel = SNAFUDecoder(line);
+                fuelRequirements.Add(fuel);
             }
 
+            long totalFuel = fuelRequirements.Sum();
+            string SNAFUFuel = SNAFUEncoder(totalFuel);
 
+            output = "Part A: Decimal = " + totalFuel +  " SNAFU = " + SNAFUFuel;
         }
 
-        public string printGrid(int xSize, int ySize)
+        public long SNAFUDecoder(string SNAFUNumberInput)
         {
-            string output = "\nGrid:\n";
-            for (int x = 0; x < xSize; x++)
+            long number = 0;
+            int inputLength = SNAFUNumberInput.Length;
+            int numberPosition = inputLength;
+            foreach (var character in SNAFUNumberInput)
             {
-                for (int y = 0; y < ySize; y++)
-                {
-                    string toWrite = grid[x, y];
-                    output += "" + toWrite;
-                }
-                output += "\n";
-            }
-            return output;
+                long value = (long)Math.Pow(5, numberPosition-1) * SNAFU[character];
+                number = number + value;
+                numberPosition--;
+            }           
+            return number;
         }
 
-        public void createGrid(int xSize, int ySize)
+        public string SNAFUEncoder(long numberInput)
         {
-            for (int x = 0; x < xSize; x++)
+            string SNAFUNumber = "";
+            long value = numberInput;
+            while(value > 0)
             {
-                for (int y = 0; y < ySize; y++)
+                long tempValue = value % 5;
+                if(tempValue == 0)
                 {
-                    grid[x, y] = "X";
+                    SNAFUNumber = 0 + SNAFUNumber;
+                } else if (tempValue == 1)
+                {
+                    SNAFUNumber = 1 + SNAFUNumber;
+                } else if (tempValue == 2)
+                {
+                    SNAFUNumber = 2 + SNAFUNumber;
+                } else if (tempValue == 3)
+                {
+                    SNAFUNumber = "=" + SNAFUNumber;
+                    value = value + 5;
+                } else if (tempValue == 4)
+                {
+                    SNAFUNumber = "-" + SNAFUNumber;
+                    value = value + 5;
                 }
-            }
-        }
 
+                value = value / 5;
+            }
+
+            return SNAFUNumber;
+        }
         public string output;
     }
 }
