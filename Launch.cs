@@ -16,10 +16,11 @@ namespace AdventofCode2022
             Console.WriteLine("------------------------\n");
 
 
-            int daySelection = 25;
+            int daySelection = 1;
+            int yearSelection = 2015;
             int partSelection = 1;
 
-            DaySelection Advent = new DaySelection(daySelection, partSelection);
+            DaySelection Advent = new DaySelection(daySelection, partSelection, yearSelection);
             
             return;
         }
