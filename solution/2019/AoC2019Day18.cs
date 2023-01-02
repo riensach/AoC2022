@@ -6,6 +6,7 @@ using System.Threading;
 using AoC2019.solution;
 using static AoC2019.solution.AoCDay18;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AoC2019.solution
 {
@@ -89,41 +90,84 @@ namespace AoC2019.solution
         public record Key(char value, GridPosition position);
         public record Door(char value, GridPosition position);
         public record Explorer(int steps, GridPosition position);
+        // HERE
+        // Think we need to add collected keys to the Explorer record
+        // Otherwise it's hard to do iteration without knowing what we've opened 
+        // Maybe add some kind of grouping of keys?
 
         public void findShortestPath(char[,] currentGrid, Explorer explorer, int currentSteps, List<char> collectedKeys)
         {
-            IDictionary<int, Key> pathOptions = findPathOptions(currentGrid, explorer, collectedKeys);
+            IDictionary<int, Key> pathOptions = findPathOptions(explorer, collectedKeys);
 
             int dictCount = pathOptions.Count();
 
-            while (pathOptions.Count() > 0)
+            // NOW HERE
+
+            // Need to work on step logic, and also keeping track of shortest path options, and what to do with multiple options
+
+            while (pathOptions.Count > 0)
             {
                 if (dictCount == 1)
                 {
+                    Console.WriteLine("Only 1 - collecting key " + pathOptions.First().Value.value + " with " + pathOptions.First().Key + " steps.");
+                    List<char> newColKeys = new List<char>(collectedKeys);
+                    newColKeys.Add(pathOptions.First().Value.value);
+                    explorer = new Explorer(pathOptions.First().Key, pathOptions.First().Value.position);
+                    //currentSteps = currentSteps + pathOptions.First().Key;
+                    if (newColKeys.Count() == keys.Count())
+                    {
+                        // All keys collected!
+                        shortestSteps.Add(pathOptions.First().Key);
+                        break;
+                    }
+                    pathOptions = findPathOptions(explorer, newColKeys);
+
+
                     // 1 option, no need to do anything else
                 }
                 else if (dictCount > 1)
                 {
+                    // This code below won't work, due to not keeping track of keys
+                    /*
+                    foreach (var pathOption in pathOptions)
+                    {
+                        List<char> newColKeys = new List<char>(collectedKeys);
+                        newColKeys.Add(pathOption.Value.value);
+                        explorer = new Explorer(pathOption.Key, pathOption.Value.position);
+                        //currentSteps = currentSteps + pathOptions.First().Key;
+                        if (newColKeys.Count() == keys.Count())
+                        {
+                            // All keys collected!
+                            shortestSteps.Add(pathOption.Key);
+                            break;
+                        }
+                        pathOptions = findPathOptions(explorer, newColKeys);
+                    }
+                    */
+
+                    Console.WriteLine("Only 2");
                     // Multiple options, time to path
                 }
                 else
                 {
+                    Console.WriteLine("Only 0");
                     // No options - what do here? All keys collected?
 
                 }
-                Console.WriteLine("Got here?");
-                pathOptions = findPathOptions(currentGrid, explorer, collectedKeys);
+                
+                dictCount = pathOptions.Count();
             }
-            shortestSteps.Add(currentSteps);
+            
 
         }
 
         public char getGridState(GridPosition position)
         {
+            //Console.WriteLine(position.x + " - " + position.y + " - " + grid[position.x, position.y]);
             return grid[position.x, position.y];         
         }
 
-        IEnumerable<Explorer> movementOptions(Explorer explorer)
+        IEnumerable<Explorer> movementOptions(Explorer explorer, Key searchingKey, List<char> collectedKeys)
         {
             foreach (var position in new GridPosition[]{
             explorer.position,
@@ -135,8 +179,10 @@ namespace AoC2019.solution
             {
                 //Console.WriteLine("At position " + explorer.position.x + "," + explorer.position.y + " and looking for our options after " + explorer.steps + " steps");
                 //Console.WriteLine(map.getGridState(explorer.steps + 1, position));
-                if (getGridState(position) == '.')
+                //Console.WriteLine("Chewcking");
+                if (getGridState(position) == '.' || (Char.IsLower(getGridState(position)) && getGridState(position) == searchingKey.value) || (collectedKeys.Contains(Char.ToUpper(getGridState(position))) || collectedKeys.Contains(Char.ToLower(getGridState(position)))))
                 {
+                    //Console.WriteLine("Returning option");
                     yield return explorer with
                     {
                         steps = explorer.steps + 1,
@@ -145,7 +191,7 @@ namespace AoC2019.solution
                 }
             }
         }
-        public IDictionary<int, Key> findPathOptions(char[,] currentGrid, Explorer explorer, List<char> collectedKeys)
+        public IDictionary<int, Key> findPathOptions(Explorer explorer, List<char> collectedKeys)
         {
             IDictionary<int, Key> pathOptions = new Dictionary<int, Key>();
             var keysNotFound = keys.Where(x => !collectedKeys.Contains(x.value));
@@ -168,59 +214,53 @@ namespace AoC2019.solution
 
                 queueFindKey.Enqueue(explorer, 1);
                 // This should be a priority-ordered list of keys to find
-                Console.WriteLine($"{searchingKey}");
+                //Console.WriteLine($"{searchingKey}");
                 HashSet<Explorer> previousExplorers = new HashSet<Explorer>();
 
                 while (queueFindKey.Count > 0)
                 {
                     var explorerCurrent = queueFindKey.Dequeue();
-                    if (explorer.position == searchingKey.position)
+                    //Console.WriteLine("Searching for key " + searchingKey.value + " at position " + searchingKey.position + " where we are at " + explorerCurrent.position);
+                    if (explorerCurrent.position == searchingKey.position)
                     {
                         // Found the key here
                         //return explorerCurrent;
-                        Console.WriteLine("Found the key");
-                        pathOptions.Add(explorer.steps, searchingKey);
+                        //Console.WriteLine("Found the key");
+                        pathOptions.Add(explorerCurrent.steps, searchingKey);
+                        break;
                     }
 
                     // GOT HERE - need to figure out how to recognise doors/keys in the movementOptions function, and what to do, and how to know if I have discovered that key
-
-                    foreach (var explorerOption in movementOptions(explorer))
+                    var explorerOptions = movementOptions(explorerCurrent, searchingKey, collectedKeys);
+                    foreach (var explorerOption in explorerOptions)
                     {
+                        // Check if we've been here before, and for less steps
+                        var explorerOptionBefore = previousExplorers.Where(x => x.position == explorerOption.position).Order();
+                        if (explorerOptionBefore.Count() > 0) {
+                            //Console.WriteLine("Steps: " + explorerOptionBefore.First().steps + " vs " + explorerOption.steps);
+                            if (explorerOptionBefore.First().steps <= explorerOption.steps)
+                            {
+                                //Console.WriteLine("Got here???");
+                                continue;
+                            }
+                        }
+
                         if (!previousExplorers.Contains(explorerOption))
                         {
+                            //Console.WriteLine("Still adding to queue");
                             previousExplorers.Add(explorerOption);
                             var dist =
                                 Math.Abs(searchingKey.position.x - explorerOption.position.x) +
                                 Math.Abs(searchingKey.position.y - explorerOption.position.y);
                             queueFindKey.Enqueue(explorerOption, dist);
-                        }
+                            //Console.WriteLine("somehow here1");
+                        } 
+                        //Console.WriteLine("somehow here2" + previousExplorers.Count());
                     }
                 }
-                
-            }
+                //Console.WriteLine("Finished searching for key " + searchingKey.value);
 
-
-            /*
-            if (currentGrid[currentX - 1, currentY] == '.')
-            {
-                // Option above to explore
             }
-            if (currentGrid[currentX + 1, currentY] == '.')
-            {
-                // Option below to explore
-            }
-            if (currentGrid[currentX, currentY - 1] == '.')
-            {
-                // Option left to explore
-            }
-            if (currentGrid[currentX, currentY + 1] == '.')
-            {
-                // Option right to explore
-            }
-            */
-
-
-
             return pathOptions;
         }
 
